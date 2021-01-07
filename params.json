@@ -1,0 +1,21 @@
+{
+  "ticker": "777",
+  "alias_prefix": "MN",
+  "header": {
+    "IHOSTMN-API-KEY": "Your API KEY goes here"
+  },
+  "new_txs": [
+    {
+      "txhash": "transaction hash 1",
+      "outputidx": 0
+    },
+    {
+      "txhash": "transaction hash 2",
+      "outputidx": 1
+    },
+    {
+      "txhash": "transaction hash 3",
+      "outputidx": 0
+    }
+  ]
+}
