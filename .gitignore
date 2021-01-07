@@ -3,10 +3,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# extensions
+# extensions and files
 *.so
 *.txt
 *.conf
+*.json
 
 # IntelliJ
 .idea/
