@@ -1,7 +1,7 @@
 # masternode_scripts
 A script to do all the shitty job when there is a collateral change
 
-* Compatible only with PIVX coins hosted on ihostmn.
+* Compatible only with non dip coins hosted on ihostmn.
 * Requires python 3.6 or higher.
 * Use at your own risk. No guarantees.
 
