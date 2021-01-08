@@ -1,3 +1,6 @@
+import time
+
+
 def progress_bar(iteration, total, fill='█'):
     """
     Call in a loop to create terminal progress bar
@@ -13,3 +16,12 @@ def progress_bar(iteration, total, fill='█'):
     # Print New Line on Complete
     if iteration == total:
         print("\n")
+
+
+def print_progress(sleep_time, fill='█'):
+    print("#### Waiting {}sec ...\n".format(sleep_time))
+    progress_bar(0, sleep_time)
+    for i in range(sleep_time):
+        time.sleep(1)
+        progress_bar(i + 1, sleep_time, fill)
+

@@ -14,10 +14,7 @@ def checks():
     print("#### List all Masternodes ###############################\n")
     #################################
 
-    for mn in command.get_masternodes_list():
-        print("Masternode {}-{} : ticker {}\n"
-              "  tx id    : {}\n"
-              "  tx index : {}\n".format(mn["alias"], mn["id"], mn["ticker"], mn["transaction_id"], mn["tx_index"]))
+    command.print_masternodes()
 
     #################################
     print("#### Save masternode.conf ##############################\n")

@@ -62,7 +62,7 @@ The file contains all the parameters needed to use the different functions
         -d      --delete        Delete all existing masternodes.
         -r      --create        Create new masternodes with transactions from params.json
                                 and saves masternode.conf file automatically at the end.
-        -r      --delcreate     Delete old masternodes and create new ones with transactions from params.json
+        -dr      --delcreate    Delete old masternodes and create new ones with transactions from params.json
                                 then save masternode.conf file automatically at the end.
         -i      --reindex       Reindex all existing masternodes wallets.
 ```
