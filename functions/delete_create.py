@@ -1,5 +1,20 @@
 from functions.ihostmn import ihostmn
+from functions.progress_bar import progress_bar
 import time
+
+
+def delete_all_and_create():
+
+    delete_all_masternodes()
+
+    sleep_time = 30  # in seconds
+    print("#### Waiting {}sec before creating new masternodes ...\n".format(sleep_time))
+    progress_bar(0, sleep_time)
+    for i in range(sleep_time):
+        time.sleep(1)
+        progress_bar(i + 1, sleep_time)
+
+    create_new_masternodes()
 
 
 def delete_all_masternodes():
@@ -22,20 +37,20 @@ def create_new_masternodes():
     print("#### Creating new masternodes ###############################\n")
     #################################
 
-    print("Waiting 30 sec before creating new masternodes ...\n")
-    time.sleep(30)
-
     command.create_masternodes()
 
     #################################
     print("#### Getting Masternode.conf ###############################\n")
     #################################
 
-    print("#### Waiting 5 minutes before getting the Masternode.conf ...")
-    time.sleep(300)
+    sleep_time = 300  # in seconds
+    print("#### Waiting {}sec before retrieving conf file ...".format(sleep_time))
+    progress_bar(0, sleep_time)
+    for i in range(sleep_time):
+        time.sleep(1)
+        progress_bar(i + 1, sleep_time)
 
     # Re-initialization needed to get the new masternodes IDs
-    print("#### Re-initializing ...\n")
     command = ihostmn()
 
     for mn in command.get_masternodes_list():

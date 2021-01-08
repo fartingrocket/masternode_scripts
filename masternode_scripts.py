@@ -1,5 +1,5 @@
 from functions.checks import checks
-from functions.delete_create import delete_all_masternodes, create_new_masternodes
+from functions.delete_create import delete_all_and_create, delete_all_masternodes, create_new_masternodes
 from functions.reindex_all import reindex_all_masternodes
 from functions.help import help_string
 import sys
@@ -19,6 +19,8 @@ def main(argv):
             delete_all_masternodes()
         elif arg in ("-r", "--create"):
             create_new_masternodes()
+        elif arg in ("-dr", "--delcreate"):
+            delete_all_and_create()
         elif arg in ("-i", "--reindex"):
             reindex_all_masternodes()
         else:
@@ -27,4 +29,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main(sys.argv[1:2])
