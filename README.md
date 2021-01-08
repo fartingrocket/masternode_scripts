@@ -7,7 +7,9 @@ A script to do all the shitty job when there is a collateral change
 
 # Usage:
 
-```python3 masternode_scripts.py [option] ...```
+```python3 masternode_scripts.py [option]```
+
+only one option at a time is allowed
 
 # Examples:
 

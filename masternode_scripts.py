@@ -29,4 +29,7 @@ def main(argv):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        print("Too many arguments. use <masternode_scripts.py -h> for help")
+        sys.exit(2)
     main(sys.argv[1:2])

@@ -4,6 +4,7 @@ help_string = "\nmasternode_scripts.py: A script to do all the shitty job when t
               "                       -> Use at your own risk. No guarantees.\n" \
               "Usage:\n" \
               "\t       python3 masternode_scripts.py [option]\n" \
+              "\t       only one option at a time is allowed" \
               "Examples:\n" \
               "\t       python3 masternode_scripts.py --checks\n" \
               "params.json file:\n" \
