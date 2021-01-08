@@ -96,7 +96,7 @@ class ihostmn:
     def print_masternodes(self):
         if self.masternodes_list is None:
             self.get_masternodes_list()
-        for mn in self.masternodes_list():
+        for mn in self.masternodes_list:
             print("Masternode {}-{} : ticker {}\n"
                   "  tx id    : {}\n"
                   "  tx index : {}\n".format(mn["alias"], mn["id"], mn["ticker"], mn["transaction_id"], mn["tx_index"]))
