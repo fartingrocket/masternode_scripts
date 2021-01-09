@@ -96,21 +96,26 @@ class ihostmn:
                     new_id = data["result"]["id"]
                     print("Masternode {} with ID {} created\n".format(alias, new_id))
 
-    def reindex_masternodes(self):
+    def reindex_all_masternodes(self):
         if self.masternodes_list is None:
             self.get_masternodes_list()
         for masternode in self.masternodes_list:
-            id_ = masternode["id"]
-            alias = masternode["alias"]
-            resp = requests.post("https://ihostmn.com/api/v1/hosting/user/send_masternode_command",
-                                 params={"id": id_, "command": "reindex"},
-                                 headers=self.headers)
-            data = resp.json()
+            self.reindex_masternode(masternode["id"])
+
+    def reindex_masternode(self, id_):
+        resp = requests.post("https://ihostmn.com/api/v1/hosting/user/send_masternode_command",
+                             params={"id": id_, "command": "reindex"},
+                             headers=self.headers)
+        data = resp.json()
+        if data["error"] != "":
+            print(data["error"])
+            sys.exit(1)
+        else:
             success = data["result"]["success"]
             if success == 1:
-                print("Masternode {}-{} successfully re-indexed\n".format(alias, id_))
+                print("Masternode {} successfully re-indexed\n".format(id_))
             else:
-                print("Failed to re-index Masternode {}-{}\n".format(alias, id_))
+                print("Failed to re-index Masternode {}\n".format(id_))
 
     def print_masternodes(self):
         if self.masternodes_list is None:

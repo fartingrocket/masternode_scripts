@@ -24,7 +24,8 @@ masternode_scripts is script to do all the shitty job when there is a collateral
                           uses transactions from params.json
                           save masternode.conf file automatically at the end.
 
-  -i      --reindex       Reindex all existing masternodes wallets.
+  -i      --reindex       Reindex all existing masternodes wallets
+                          gives the option to reindex only some of them.
 ```
 
 # Usage:

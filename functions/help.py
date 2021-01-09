@@ -27,4 +27,5 @@ help_string = "\nmasternode_scripts.py:\n" \
               "\t-dr\t--delcreate \tDelete old masternodes and create new ones\n" \
               "\t\t\t        uses transactions from params.json\n" \
               "\t\t\t        save masternode.conf file automatically at the end.\n\n" \
-              "\t-i \t--reindex    \tReindex all existing masternodes wallets.\n"
+              "\t-i \t--reindex    \tReindex all existing masternodes wallets\n" \
+              "\t\t\t        gives the option to reindex only some of them.\n" \
