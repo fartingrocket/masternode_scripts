@@ -1,9 +1,31 @@
-# masternode_scripts
-A script to do all the shitty job when there is a collateral change
+# General description:
+masternode_scripts is script to do all the shitty job when there is a collateral change
 
 * Compatible only with non dip coins hosted on ihostmn.
 * Requires python 3.6 or higher.
 * Use at your own risk. No guarantees.
+
+# Options:
+
+```
+  -h      --help          Get this menu.
+
+  -c      --checks        Do checks on balance and existing masternodes
+                          offers the possibility to save masternode.conf file.
+
+  -d      --delete        Delete all existing masternodes.
+                          must specify correct ticker in params.json
+
+  -r      --create        Create new masternodes with transactions
+                          uses transactions from params.json
+                          save masternode.conf file automatically at the end.
+
+  -dr     --delcreate     Delete old masternodes and create new ones
+                          uses transactions from params.json
+                          save masternode.conf file automatically at the end.
+
+  -i      --reindex       Reindex all existing masternodes wallets.
+```
 
 # Usage:
 
@@ -19,7 +41,7 @@ only one option at a time is allowed
 > python3 masternode_scripts.py --checks
 ```
 
-Will yield the following result (obviously all the info is fake, don't try to search it)
+Will yield the following result:
 
 ```
 #### Account Balance ####################################
@@ -48,6 +70,13 @@ masternode.conf saved to ~/Documents/masternode_scripts
 
 # params.json file:
 
+The script comes with an integrated configurator that will help you generate the params.json file.
+However the transactions for the creation of new masternodes have to be copied manually from 
+your wallet.
+
+An example params.json is provided but not needed. You can delete it and you will be prompted to create
+a new one.
+
 The file contains all the parameters needed to use the different functions
 * ticker: SAPP, 777, UCR, ODC, etc...
 * alias_prefix: prefix for naming the newly created masternodes (default = "MN", so by default the created masternodes 
@@ -55,18 +84,4 @@ The file contains all the parameters needed to use the different functions
 * IHOSTMN-API-KEY: You need to get it from ihostmn so you can connect to your account 
   * visit https://ihostmn.com/settings.php to get your key.
 * new_txs: the list of transaction hashes and transaction indexes to create new MNs. 
-  Simply type in your wallet console `getmasternodeoutputs` and copy/paste the result
-
-# Options:
-
-```
-  -h      --help          Get this menu.
-  -c      --checks        Do checks on balance and existing masternodes
-                          and offers the possibility to save masternode.conf file.
-  -d      --delete        Delete all existing masternodes.
-  -r      --create        Create new masternodes with transactions from params.json
-                          and saves masternode.conf file automatically at the end.
-  -dr     --delcreate     Delete old masternodes and create new ones with transactions from params.json
-                          then save masternode.conf file automatically at the end.
-  -i      --reindex       Reindex all existing masternodes wallets.
-```
+  Simply type in your wallet console `getmasternodeoutputs` and copy/paste the result there

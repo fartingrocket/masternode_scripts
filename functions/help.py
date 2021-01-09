@@ -16,12 +16,15 @@ help_string = "\nmasternode_scripts.py:\n" \
               "\t       -> new_txs: the list of transaction hashes and transaction indexes to create new MNs\n" \
               "\t          simply type in your wallet console 'getmasternodeoutputs' and copy/paste the result\n" \
               "Options:\n" \
-              "\t-h \t--help       \tGet this menu.\n" \
+              "\t-h \t--help       \tGet this menu.\n\n" \
               "\t-c \t--checks     \tDo checks on balance and existing masternodes\n" \
-              "\t\t \t        and offers the possibility to save masternode.conf file.\n" \
+              "\t\t\t        offers the possibility to save masternode.conf file.\n\n" \
               "\t-d \t--delete     \tDelete all existing masternodes.\n" \
-              "\t-r \t--create     \tCreate new masternodes with transactions from params.json\n" \
-              "\t\t\t        and save masternode.conf file automatically at the end.\n" \
-              "\t-dr\t--delcreate \tDelete old masternodes and create new ones with transactions from params.json\n" \
-              "\t\t\t        then save masternode.conf file automatically at the end (combination of -d -r).\n" \
+              "\t\t\t        must specify correct ticker in params.json\n\n" \
+              "\t-r \t--create     \tCreate new masternodes with transactions\n" \
+              "\t\t\t        uses transactions from params.json\n" \
+              "\t\t\t        save masternode.conf file automatically at the end.\n\n" \
+              "\t-dr\t--delcreate \tDelete old masternodes and create new ones\n" \
+              "\t\t\t        uses transactions from params.json\n" \
+              "\t\t\t        save masternode.conf file automatically at the end.\n\n" \
               "\t-i \t--reindex    \tReindex all existing masternodes wallets.\n"
