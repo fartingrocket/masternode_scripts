@@ -16,6 +16,8 @@ def checks():
 
     command.print_masternodes()
 
+    command.check_block_height()
+
     #################################
     print("#### Save masternode.conf ##############################\n")
     #################################

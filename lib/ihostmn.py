@@ -1,6 +1,7 @@
 import sys
 import requests
 import os
+import bcolors
 from lib.configurator import configurator
 
 
@@ -117,13 +118,31 @@ class ihostmn:
             else:
                 print("Failed to re-index Masternode {}\n".format(id_))
 
+    def check_block_height(self):
+        if self.masternodes_list is None:
+            self.get_masternodes_list()
+        heights = []
+        for mn in self.masternodes_list:
+            heights.append(mn["local_blocks"])
+            heights.append(mn["remote_blocks"])
+        if len(set(heights)) > 1:
+            print(f"{bcolors.WARN}Warning: Some block heights are inconsistent, "
+                  f"some Masternodes may need reindexing{bcolors.ENDC}\n")
+
     def print_masternodes(self):
         if self.masternodes_list is None:
             self.get_masternodes_list()
         for mn in self.masternodes_list:
             print("Masternode {}-{} : ticker {}\n"
-                  "  tx id    : {}\n"
-                  "  tx index : {}\n".format(mn["alias"], mn["id"], mn["ticker"], mn["transaction_id"], mn["tx_index"]))
+                  "| tx id        : {}\n"
+                  "| tx index     : {}\n"
+                  "| block height : {} peers\n"
+                  "| | local blocks  - {}\n"
+                  "| | remote blocks - {}\n".format(mn["alias"], mn["id"], mn["ticker"],
+                                                    mn["transaction_id"],
+                                                    mn["tx_index"],
+                                                    mn["peers"],
+                                                    mn["local_blocks"], mn["remote_blocks"]))
 
     @staticmethod
     def prompt_confirmation(message) -> bool:
