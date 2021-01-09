@@ -1,4 +1,4 @@
-from functions.ihostmn import ihostmn
+from lib.ihostmn import ihostmn
 
 
 def checks():
