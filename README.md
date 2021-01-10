@@ -10,6 +10,9 @@ masternode_scripts is script to do all the shitty job when there is a collateral
 ```
   -h      --help          Get this menu.
 
+  -g      --configure     Starts the configuration manager
+                          helps creating the params.json file.
+
   -c      --checks        Do checks on balance and existing masternodes
                           offers the possibility to save masternode.conf file.
 
@@ -80,9 +83,22 @@ a new one.
 
 The file contains all the parameters needed to use the different functions
 * ticker: SAPP, 777, UCR, ODC, etc...
+* wallet_data_dir: Path to the data directory of your wallet (directory containing the blockchain and wallet.conf)
+* wallet_cli_path: wallet to the `cli` binary
 * alias_prefix: prefix for naming the newly created masternodes (default = "MN", so by default the created masternodes 
   will have aliases: MN1, MN2, etc...)
 * IHOSTMN-API-KEY: You need to get it from ihostmn so you can connect to your account 
   * visit https://ihostmn.com/settings.php to get your key.
 * new_txs: the list of transaction hashes and transaction indexes to create new MNs. 
-  Simply type in your wallet console `getmasternodeoutputs` and copy/paste the result there
+  You have two options :
+  
+  1) Simply type in your wallet console `getmasternodeoutputs` and copy/paste the result there
+  2) Using the daemon, you can retrieve the transactions using the configurator (see : How to setup the wallet handles)
+  
+# How to setup the wallet handles:
+You should either run the wallet daemon with a -server parameter or add parameters `daemon=1` and `server=1`
+to the wallet.conf file of your wallet. This will yield the same result.
+
+Once the wallet.conf edited, simply restart your wallet and wait for it to sync.
+
+The script should now be able to query the wallet. Given that you provided the correct paths in the configuration step.

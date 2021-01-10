@@ -1,5 +1,6 @@
 from lib.ihostmn import ihostmn
 from functions.progress_bar import print_progress
+from lib.prompt import prompt_confirmation
 
 
 def delete_all_and_create():
@@ -19,7 +20,7 @@ def delete_all_masternodes():
     print("#### Deleting old masternodes ###############################\n")
     #################################
 
-    if command.prompt_confirmation("Are you sure you want to delete all masternodes ? (y/n) : "):
+    if prompt_confirmation("Are you sure you want to delete all masternodes ? (y/n) : "):
         command.delete_masternodes()
     else:
         print("Deletion cancelled.")

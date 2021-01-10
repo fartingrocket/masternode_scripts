@@ -1,4 +1,5 @@
 from lib.ihostmn import ihostmn
+from lib.prompt import prompt_confirmation
 
 
 def checks():
@@ -22,7 +23,7 @@ def checks():
     print("#### Save masternode.conf ##############################\n")
     #################################
 
-    if command.prompt_confirmation("Do you want to save masternode.conf file ? (y/n) : "):
+    if prompt_confirmation("Do you want to save masternode.conf file ? (y/n) : "):
         command.save_masternode_conf()
     else:
         print("Save cancelled.")

@@ -1,3 +1,4 @@
+from functions.configure import configure
 from functions.checks import checks
 from functions.delete_create import delete_all_and_create, delete_all_masternodes, create_new_masternodes
 from functions.reindex import reindex_masternodes
@@ -12,7 +13,8 @@ def main(argv):
     for arg in argv:
         if arg in ("-h", "--help"):
             print(help_string)
-            sys.exit()
+        elif arg in ("-g", "--configure"):
+            configure()
         elif arg in ("-c", "--checks"):
             checks()
         elif arg in ("-d", "--delete"):

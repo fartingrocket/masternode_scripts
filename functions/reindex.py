@@ -1,4 +1,5 @@
 from lib.ihostmn import ihostmn
+from lib.prompt import prompt_confirmation
 
 
 def reindex_masternodes():
@@ -10,7 +11,7 @@ def reindex_masternodes():
 
     command.print_masternodes()
 
-    if command.prompt_confirmation("Do you want to reindex all or individually ? 'y' for all (y/n) : "):
+    if prompt_confirmation("Do you want to reindex all or individually ? 'y' for all (y/n) : "):
         command.reindex_all_masternodes()
     else:
         id_ = input("Please input the index (Leave empty and press 'Enter' to quit): ")

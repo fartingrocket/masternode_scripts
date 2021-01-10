@@ -17,6 +17,8 @@ help_string = "\nmasternode_scripts.py:\n" \
               "\t          simply type in your wallet console 'getmasternodeoutputs' and copy/paste the result\n" \
               "Options:\n" \
               "\t-h \t--help       \tGet this menu.\n\n" \
+              "\t-g \t--configure  \tStarts the configuration manager\n" \
+              "\t\t\t        helps creating the params.json file.\n\n" \
               "\t-c \t--checks     \tDo checks on balance and existing masternodes\n" \
               "\t\t\t        offers the possibility to save masternode.conf file.\n\n" \
               "\t-d \t--delete     \tDelete all existing masternodes.\n" \

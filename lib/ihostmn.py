@@ -3,16 +3,18 @@ import requests
 import os
 import bcolors
 from lib.configurator import configurator
+from lib.prompt import prompt_confirmation
 
 
 class ihostmn:
 
     def __init__(self):
-        config = configurator()
-        self.headers = config.header
-        self.ticker = config.ticker
-        self.alias_prefix = config.alias_prefix
-        self.new_txs = config.new_txs
+        self.config = configurator()
+        self.config.load()
+        self.headers = self.config.headers
+        self.ticker = self.config.ticker
+        self.alias_prefix = self.config.alias_prefix
+        self.new_txs = self.config.new_txs
         self.balance = None
         self.masternodes_list = None
         self.masternodes_conf = None
@@ -74,10 +76,16 @@ class ihostmn:
 
     def create_masternodes(self):
         if not self.new_txs:
-            print("New transactions for Masternode creation appear to be missing\n"
-                  "Please set them manually in params.json then restart\n")
-            sys.exit(1)
+            print("New transactions for Masternode creation appear to empty in params.json")
+            if prompt_confirmation("Do wish to set up the wallet handles ? (y/n) : "):
+                self.config.set_new_txs()
+            else:
+                print("\nYou cancelled the wallet setup!\n"
+                      "Please enter the transactions manually in params.json before restarting\n"
+                      "You can restart using option --create\n")
+                sys.exit()
         else:
+            print("Transactions found, creating Masternodes")
             for tx in self.new_txs:
                 tx_id = tx["txhash"]
                 tx_index = tx["outputidx"]
@@ -114,9 +122,12 @@ class ihostmn:
         else:
             success = data["result"]["success"]
             if success == 1:
-                print("Masternode {} successfully re-indexed\n".format(id_))
+                print("Masternode {} successfully re-indexed".format(id_))
             else:
-                print("Failed to re-index Masternode {}\n".format(id_))
+                print("Failed to re-index Masternode {}".format(id_))
+
+        # print a new line when all done
+        print()
 
     def check_block_height(self):
         if self.masternodes_list is None:
@@ -143,11 +154,3 @@ class ihostmn:
                                                     mn["tx_index"],
                                                     mn["peers"],
                                                     mn["local_blocks"], mn["remote_blocks"]))
-
-    @staticmethod
-    def prompt_confirmation(message) -> bool:
-        user_input = ""
-        while user_input not in ("y", "n"):
-            user_input = input(message).lower()
-
-        return True if user_input == "y" else False
