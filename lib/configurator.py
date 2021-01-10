@@ -1,5 +1,7 @@
 import json
 import os
+import sys
+
 from lib.prompt import prompt_confirmation
 from lib.wallet import wallet
 
@@ -53,7 +55,11 @@ class configurator:
                 print("'{}' found : {}".format("new_txs", self.new_txs))
             else:
                 print("Missing param 'new_txs' in the params.json")
-                self.set_new_txs()
+                if prompt_confirmation("Do you want to use the wallet interface ? (y/n) : "):
+                    self.set_new_txs()
+                else:
+                    print("\nYou cancelled the wallet setup!\n"
+                          "Please enter the transactions manually in params.json before restarting\n")
             self.save_params_json()
         else:
             print("#### Missing or empty params.json file starting configuration mode\n")
@@ -65,8 +71,11 @@ class configurator:
         self.set_ticker()
         self.set_alias_prefix()
         self.set_header()
-        if prompt_confirmation("Do you want to setup the wallet interface ? (y/n) : "):
+        if prompt_confirmation("Do you want to use the wallet interface ? (y/n) : "):
             self.set_new_txs()
+        else:
+            print("\nYou cancelled the wallet setup!\n"
+                  "Please enter the transactions manually in params.json before restarting\n")
 
     def save_params_json(self, reload=False):
 
@@ -115,11 +124,15 @@ class configurator:
             wallet_handle = wallet(data_dir=self.wallet_data_dir, cli_path=self.wallet_cli_path)
             if wallet_handle.check_server():
                 self.new_txs = json.loads(wallet_handle.get_masternode_outputs())
+                print("Transactions retrieved from wallet:\n"
+                      "{}".format(self.new_txs))
             else:
-                print("Cannot connect to wallet. please check your wallet configuration.\n")
+                print("Cannot connect to wallet.\n"
+                      "Please check your wallet configuration or enter the transactions manually in params.json\n")
                 self.new_txs = []
+                sys.exit(0)
         else:
-            if prompt_confirmation("Do you wish to setup the wallet handles now ? (y/n) : "):
+            if prompt_confirmation("Handles missing. Do you wish to setup the wallet handles now ? (y/n) : "):
                 self.set_wallet_handles()
             else:
                 self.new_txs = []

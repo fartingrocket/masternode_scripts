@@ -11,16 +11,12 @@ class ihostmn:
     def __init__(self):
         self.config = configurator()
         self.config.load()
-        self.headers = self.config.headers
-        self.ticker = self.config.ticker
-        self.alias_prefix = self.config.alias_prefix
-        self.new_txs = self.config.new_txs
         self.balance = None
         self.masternodes_list = None
         self.masternodes_conf = None
 
     def get_balance(self) -> str:
-        resp = requests.get("https://ihostmn.com/api/v1/hosting/user/get_balance", headers=self.headers)
+        resp = requests.get("https://ihostmn.com/api/v1/hosting/user/get_balance", headers=self.config.headers)
         data = resp.json()
         if data["error"] != "":
             print(data["error"])
@@ -31,14 +27,14 @@ class ihostmn:
 
     def get_masternodes_list(self):
         _list = []
-        resp = requests.get("https://ihostmn.com/api/v1/hosting/user/list_masternodes", headers=self.headers)
+        resp = requests.get("https://ihostmn.com/api/v1/hosting/user/list_masternodes", headers=self.config.headers)
         data = resp.json()
         if data["error"] != "":
             print(data["error"])
             sys.exit(1)
         else:
             for masternode in data["result"]["masternodes"]:
-                if self.ticker == masternode["ticker"]:
+                if self.config.ticker == masternode["ticker"]:
                     _list.append(masternode)
             self.masternodes_list = _list
 
@@ -65,7 +61,7 @@ class ihostmn:
             alias = masternode["alias"]
             resp = requests.post("https://ihostmn.com/api/v1/hosting/user/delete_masternode",
                                  params={"id": id_},
-                                 headers=self.headers)
+                                 headers=self.config.headers)
             data = resp.json()
             if data["error"] != "":
                 print(data["error"])
@@ -75,35 +71,33 @@ class ihostmn:
                     print("Masternode {}-{} deleted\n".format(id_, alias))
 
     def create_masternodes(self):
-        if not self.new_txs:
-            print("New transactions for Masternode creation appear to empty in params.json")
-            if prompt_confirmation("Do wish to set up the wallet handles ? (y/n) : "):
-                self.config.set_new_txs()
+        if self.config.new_txs and self.config.new_txs != []:
+            if prompt_confirmation("Transactions found, create Masternodes now ? (y/n) : "):
+                for tx in self.config.new_txs:
+                    tx_id = tx["txhash"]
+                    tx_index = tx["outputidx"]
+                    alias = self.config.alias_prefix + str(self.config.new_txs.index(tx))
+                    resp = requests.post("https://ihostmn.com/api/v1/hosting/user/create_new_masternode",
+                                         params={"cointicker": self.config.ticker,
+                                                 "alias": alias,
+                                                 "txid": tx_id,
+                                                 "txindex": tx_index,
+                                                 "dip": 0},
+                                         headers=self.config.headers)
+                    data = resp.json()
+                    if data["error"] != "":
+                        print(data["error"])
+                        sys.exit(1)
+                    else:
+                        new_id = data["result"]["id"]
+                        print("Masternode {} with ID {} created\n".format(alias, new_id))
             else:
-                print("\nYou cancelled the wallet setup!\n"
-                      "Please enter the transactions manually in params.json before restarting\n"
-                      "You can restart using option --create\n")
-                sys.exit()
+                print("Masternode creation cancelled\n")
+                sys.exit(0)
         else:
-            print("Transactions found, creating Masternodes")
-            for tx in self.new_txs:
-                tx_id = tx["txhash"]
-                tx_index = tx["outputidx"]
-                alias = self.alias_prefix + str(self.new_txs.index(tx))
-                resp = requests.post("https://ihostmn.com/api/v1/hosting/user/create_new_masternode",
-                                     params={"cointicker": self.ticker,
-                                             "alias": alias,
-                                             "txid": tx_id,
-                                             "txindex": tx_index,
-                                             "dip": 0},
-                                     headers=self.headers)
-                data = resp.json()
-                if data["error"] != "":
-                    print(data["error"])
-                    sys.exit(1)
-                else:
-                    new_id = data["result"]["id"]
-                    print("Masternode {} with ID {} created\n".format(alias, new_id))
+            # Should not end here anyway
+            print("Transactions not found")
+            sys.exit(1)
 
     def reindex_all_masternodes(self):
         if self.masternodes_list is None:
@@ -114,7 +108,7 @@ class ihostmn:
     def reindex_masternode(self, id_):
         resp = requests.post("https://ihostmn.com/api/v1/hosting/user/send_masternode_command",
                              params={"id": id_, "command": "reindex"},
-                             headers=self.headers)
+                             headers=self.config.headers)
         data = resp.json()
         if data["error"] != "":
             print(data["error"])
