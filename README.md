@@ -75,8 +75,15 @@ masternode.conf saved to ~/Documents/masternode_scripts
 # params.json file:
 
 The script comes with an integrated configurator that will help you generate the params.json file.
-However the transactions for the creation of new masternodes have to be copied manually from 
-your wallet.
+
+Simply use :
+
+```
+> python3 masternode_scripts --configure
+```
+
+You will have the choice to either load a previous params.json and complete the missing params, 
+or create a new one from scratch (advised), which will overwrite the old one.
 
 An example params.json is provided but not needed. You can delete it and you will be prompted to create
 a new one.
