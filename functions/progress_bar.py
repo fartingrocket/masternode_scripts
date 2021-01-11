@@ -19,7 +19,7 @@ def progress_bar(iteration, total, fill='█'):
 
 
 def print_progress(sleep_time, fill='█'):
-    print("#### Waiting {}sec ...\n".format(sleep_time))
+    print("#### Waiting {} sec. 'Ctrl+Z' to stop the process here and quit.".format(sleep_time))
     progress_bar(0, sleep_time)
     for i in range(sleep_time):
         time.sleep(1)

@@ -71,26 +71,41 @@ class ihostmn:
                     print("Masternode {}-{} deleted\n".format(id_, alias))
 
     def create_masternodes(self):
+        if self.masternodes_list is None:
+            self.get_masternodes_list()
+        created_new_mn = False
         if self.config.new_txs and self.config.new_txs not in ({}, [], "", None):
             if prompt_confirmation("Transactions found, create Masternodes now ? (y/n) : "):
+                mn_counter = 1
                 for tx in self.config.new_txs:
-                    self.create_masternode(tx)
+                    alias = self.config.alias_prefix + str(mn_counter)
+                    # Check if the transaction is already used in another MN
+                    # Useful for the --create option
+                    if tx["txhash"] in [mn["transaction_id"] for mn in self.masternodes_list]:
+                        print("Transaction : {}\nalready used for another Masternode. Skipping.\n".format(tx["txhash"]))
+                    else:
+                        if alias in [mn["alias"] for mn in self.masternodes_list]:
+                            mn_counter += 1
+                            alias = self.config.alias_prefix + str(mn_counter)
+                        # Now we are sure the tx and the alias are not used in another MN
+                        self.create_masternode(tx, alias)
+                        created_new_mn = True
+                if not created_new_mn:
+                    print("No new Masternodes were created. Leaving now.\n")
+                    sys.exit(0)
             else:
                 print("Masternode creation cancelled\n")
                 sys.exit(0)
         else:
-            # End here if no transactions in params.json and user cancels wallet interface
-            if prompt_confirmation("Missing transactions\nDo you want to use the wallet interface ? (y/n) : "):
-                self.config.set_new_txs()
-            else:
-                print("\nWallet setup cancelled!\n"
-                      "Please enter the transactions manually in params.json before restarting\n")
-                sys.exit(1)
+            # End here if no transactions in params.json
+            print("Missing transactions!")
+            self.config.set_new_txs()
+            self.config.save_params_json()
+            self.create_masternodes()
 
-    def create_masternode(self, tx):
+    def create_masternode(self, tx, alias):
         tx_id = tx["txhash"]
         tx_index = tx["outputidx"]
-        alias = self.config.alias_prefix + str(self.config.new_txs.index(tx))
         resp = requests.post("https://ihostmn.com/api/v1/hosting/user/create_new_masternode",
                              params={"cointicker": self.config.ticker,
                                      "alias": alias,
