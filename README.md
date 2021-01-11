@@ -1,7 +1,7 @@
 # General description:
 masternode_scripts is a script to do all the tedious job when there is a collateral change
 
-* Work in progress, please don't mind the bugs
+* Work in progress, please don't mind the bugs (You are welcome to do a Pull Request)
 * Compatible only with PIVX based coins (non dip) hosted on ihostmn.
 * Requires python 3.6 or higher.
 * Use at your own risk. No guarantees.
@@ -49,28 +49,39 @@ only one option at a time is allowed
 Will yield the following result:
 
 ```
+
 #### Account Balance ####################################
 
-  Current balance = 2.16 EUR
+  Current balance = 15.16 EUR
 
 #### List all Masternodes ###############################
 
-Masternode MN1-XXXXX : ticker 777
-  tx id    : o3xs3e02cxxvbp0ujzv5e47nlk0la6ju97dtujvoov20kekmnqh2zvsaimnztcok
-  tx index : 0
-
 Masternode MN2-XXXXX : ticker 777
-  tx id    : sufx1i6rp27neypitm8b2qcykshayxqw1v44vfe5yo1ekx3ciasn7jo0feanjyv3
-  tx index : 0
+| tx id        : o3xs3e02cxxvbp0ujzv5e47nlk0la6ju97dtujvoov20kekmnqh2zvsaimnztcok
+| tx index     : 0
+| block height : 16 peers
+| | local blocks  - 683586
+| | remote blocks - 683586
+
+Masternode MN1-XXXXX : ticker 777
+| tx id        : sufx1i6rp27neypitm8b2qcykshayxqw1v44vfe5yo1ekx3ciasn7jo0feanjyv3
+| tx index     : 0
+| block height : 16 peers
+| | local blocks  - 683586
+| | remote blocks - 683586
 
 Masternode MN3-XXXXX : ticker 777
-  tx id    : khro35p0ycdo5m41d29p4cauui2wwqwoa050klhtznmf8o3gcvobw0cr3t0oz1f1
-  tx index : 1
+| tx id        : khro35p0ycdo5m41d29p4cauui2wwqwoa050klhtznmf8o3gcvobw0cr3t0oz1f1
+| tx index     : 1
+| block height : 16 peers
+| | local blocks  - 683586
+| | remote blocks - 683586
 
 #### Save masternode.conf ##############################
 
 Do you want to save masternode.conf file ? (y/n) : y
 masternode.conf saved to ~/Documents/masternode_scripts
+
 ```
 
 # params.json file:
