@@ -14,11 +14,11 @@ class configurator:
     def __init__(self):
         self.params_file = os.getcwd() + "/params.json"
         self.ticker = None
-        self.wallet_data_dir = None
-        self.wallet_cli_path = None
+        self.wallet_data_dir = ""
+        self.wallet_cli_path = ""
         self.alias_prefix = None
         self.headers = None
-        self.new_txs = None
+        self.new_txs = []
 
     def load(self):
 
@@ -50,7 +50,7 @@ class configurator:
             else:
                 print("Missing param 'headers' in the params.json. Attempting to retrieve.")
                 self.set_header()
-            if "new_txs" in loaded_params and loaded_params["new_txs"] != []:
+            if "new_txs" in loaded_params and loaded_params["new_txs"] != [] and not loaded_params["new_txs"]:
                 self.new_txs = loaded_params["new_txs"]
                 print("'{}' found : {}".format("new_txs", self.new_txs))
             else:
@@ -58,7 +58,7 @@ class configurator:
                 if prompt_confirmation("Do you want to use the wallet interface ? (y/n) : "):
                     self.set_new_txs()
                 else:
-                    print("\nYou cancelled the wallet setup!\n"
+                    print("\nWallet setup cancelled!\n"
                           "Please enter the transactions manually in params.json before restarting\n")
             self.save_params_json()
         else:
@@ -74,7 +74,7 @@ class configurator:
         if prompt_confirmation("Do you want to use the wallet interface ? (y/n) : "):
             self.set_new_txs()
         else:
-            print("\nYou cancelled the wallet setup!\n"
+            print("\nWallet setup cancelled!\n"
                   "Please enter the transactions manually in params.json before restarting\n")
 
     def save_params_json(self, reload=False):
@@ -129,13 +129,10 @@ class configurator:
             else:
                 print("Cannot connect to wallet.\n"
                       "Please check your wallet configuration or enter the transactions manually in params.json\n")
-                self.new_txs = []
                 sys.exit(0)
         else:
             if prompt_confirmation("Handles missing. Do you wish to setup the wallet handles now ? (y/n) : "):
                 self.set_wallet_handles()
-            else:
-                self.new_txs = []
         return self.new_txs
 
     def set_wallet_handles(self):
@@ -145,8 +142,8 @@ class configurator:
         if not self.wallet_cli_path:
             self.set_wallet_cli_path()
 
-        if not self.wallet_data_dir or not self.wallet_cli_path:
-            if prompt_confirmation("The paths you entered to the data directory and cli binary are empty !\n"
+        if self.wallet_data_dir == "" or self.wallet_cli_path == "":
+            if prompt_confirmation("Entered paths to the data directory and/or cli binary are empty !\n"
                                    "Do you wish to cancel wallet setup ? (y/n) : "):
                 pass
             else:
@@ -155,11 +152,9 @@ class configurator:
             self.set_new_txs()
 
     def set_wallet_data_dir(self):
-        _input = input("Input the path to {} data directory : ".format(self.ticker))
-        self.wallet_data_dir = _input if _input != "" else None
+        self.wallet_data_dir = input("Input the path to {} data directory : ".format(self.ticker))
         return self.wallet_data_dir
 
     def set_wallet_cli_path(self):
-        _input = input("Input the path to the {} cli binary : ".format(self.ticker))
-        self.wallet_cli_path = _input if _input != "" else None
+        self.wallet_cli_path = _input = input("Input the path to the {} cli binary : ".format(self.ticker))
         return self.wallet_cli_path

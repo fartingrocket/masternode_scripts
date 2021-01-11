@@ -42,8 +42,8 @@ def create_new_masternodes():
     # Waiting 300sec before retrieving conf file
     print_progress(300)
 
-    # Re-initialization needed to get the new masternodes IDs
-    command = ihostmn()
+    # Get the new masternodes IDs
+    command.get_masternodes_list()
 
     command.print_masternodes()
 
