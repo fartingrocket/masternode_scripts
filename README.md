@@ -1,7 +1,8 @@
 # General description:
-masternode_scripts is script to do all the shitty job when there is a collateral change
+masternode_scripts is a script to do all the tedious job when there is a collateral change
 
-* Compatible only with non dip coins hosted on ihostmn.
+* Work in progress, please don't mind the bugs
+* Compatible only with PIVX based coins (non dip) hosted on ihostmn.
 * Requires python 3.6 or higher.
 * Use at your own risk. No guarantees.
 
@@ -89,14 +90,14 @@ An example params.json is provided but not needed. You can delete it and you wil
 a new one.
 
 The file contains all the parameters needed to use the different functions
-* ticker: SAPP, 777, UCR, ODC, etc...
-* wallet_data_dir: Path to the data directory of your wallet (directory containing the blockchain and wallet.conf)
-* wallet_cli_path: wallet to the `cli` binary
-* alias_prefix: prefix for naming the newly created masternodes (default = "MN", so by default the created masternodes 
+* `ticker`: SAPP, 777, UCR, ODC, etc...
+* `wallet_data_dir`: Path to the data directory of your wallet (directory containing the blockchain and wallet.conf)
+* `wallet_cli_path`: wallet to the `cli` binary
+* `alias_prefix`: prefix for naming the newly created masternodes (default = "MN", so by default the created masternodes 
   will have aliases: MN1, MN2, etc...)
-* IHOSTMN-API-KEY: You need to get it from ihostmn so you can connect to your account 
+* `IHOSTMN-API-KEY`: You need to get it from ihostmn so you can connect to your account 
   * visit https://ihostmn.com/settings.php to get your key.
-* new_txs: the list of transaction hashes and transaction indexes to create new MNs. 
+* `new_txs`: the list of transaction hashes and transaction indexes to create new MNs. 
   You have two options :
   
   1) Simply type in your wallet console `getmasternodeoutputs` and copy/paste the result there
