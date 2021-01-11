@@ -26,40 +26,35 @@ class configurator:
             print("\n#### Reading params.json\n")
             with open(self.params_file) as json_file:
                 loaded_params = json.load(json_file)
-            if "ticker" in loaded_params:
+            if "ticker" in loaded_params and loaded_params["ticker"] not in ({}, [], "", None):
                 self.ticker = loaded_params["ticker"]
                 print("'{}' found : {}".format("ticker", self.ticker))
             else:
                 print("Missing param 'ticker' in the params.json")
                 self.set_ticker()
-            if "wallet_data_dir" in loaded_params and loaded_params["wallet_data_dir"] != "":
+            if "wallet_data_dir" in loaded_params and loaded_params["wallet_data_dir"] not in ({}, [], "", None):
                 self.wallet_data_dir = loaded_params["wallet_data_dir"]
                 print("'{}' found : {}".format("wallet_data_dir", self.wallet_data_dir))
-            if "wallet_cli_path" in loaded_params and loaded_params["wallet_cli_path"] != "":
+            if "wallet_cli_path" in loaded_params and loaded_params["wallet_cli_path"] not in ({}, [], "", None):
                 self.wallet_cli_path = loaded_params["wallet_cli_path"]
                 print("'{}' found : {}".format("wallet_cli_path", self.wallet_cli_path))
-            if "alias_prefix" in loaded_params and loaded_params["alias_prefix"] != "":
+            if "alias_prefix" in loaded_params and loaded_params["alias_prefix"] not in ({}, [], "", None):
                 self.alias_prefix = loaded_params["alias_prefix"]
                 print("'{}' found : {}".format("alias_prefix", self.alias_prefix))
             else:
                 print("Missing param 'alias_prefix' in the params.json")
                 self.set_alias_prefix()
-            if "headers" in loaded_params:
+            if "headers" in loaded_params and loaded_params["headers"] not in ({}, [], "", None):
                 self.headers = loaded_params["headers"]
                 print("'{}' found : {}".format("headers", self.headers))
             else:
                 print("Missing param 'headers' in the params.json. Attempting to retrieve.")
                 self.set_header()
-            if "new_txs" in loaded_params and loaded_params["new_txs"] != [] and not loaded_params["new_txs"]:
+            if "new_txs" in loaded_params and loaded_params["new_txs"] not in ({}, [], "", None):
                 self.new_txs = loaded_params["new_txs"]
                 print("'{}' found : {}".format("new_txs", self.new_txs))
             else:
                 print("Missing param 'new_txs' in the params.json")
-                if prompt_confirmation("Do you want to use the wallet interface ? (y/n) : "):
-                    self.set_new_txs()
-                else:
-                    print("\nWallet setup cancelled!\n"
-                          "Please enter the transactions manually in params.json before restarting\n")
             self.save_params_json()
         else:
             print("#### Missing or empty params.json file starting configuration mode\n")

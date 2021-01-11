@@ -71,7 +71,7 @@ class ihostmn:
                     print("Masternode {}-{} deleted\n".format(id_, alias))
 
     def create_masternodes(self):
-        if self.config.new_txs and self.config.new_txs != []:
+        if self.config.new_txs and self.config.new_txs not in ({}, [], "", None):
             if prompt_confirmation("Transactions found, create Masternodes now ? (y/n) : "):
                 for tx in self.config.new_txs:
                     self.create_masternode(tx)
@@ -80,8 +80,12 @@ class ihostmn:
                 sys.exit(0)
         else:
             # End here if no transactions in params.json and user cancels wallet interface
-            print("Transactions not found. Aborting\n")
-            sys.exit(1)
+            if prompt_confirmation("Missing transactions\nDo you want to use the wallet interface ? (y/n) : "):
+                self.config.set_new_txs()
+            else:
+                print("\nWallet setup cancelled!\n"
+                      "Please enter the transactions manually in params.json before restarting\n")
+                sys.exit(1)
 
     def create_masternode(self, tx):
         tx_id = tx["txhash"]
@@ -135,6 +139,10 @@ class ihostmn:
         if len(set(heights)) > 1:
             print(f"{bcolors.WARN}Warning: Some block heights are inconsistent, "
                   f"some Masternodes may need reindexing{bcolors.ENDC}\n")
+            if prompt_confirmation("Reindex now ? ? (y/n) : "):
+                self.reindex_all_masternodes()
+            else:
+                print("Reindex cancelled\n")
 
     def print_masternodes(self):
         if self.masternodes_list is None:
