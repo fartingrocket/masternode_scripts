@@ -16,6 +16,7 @@ class configurator:
         self.ticker = None
         self.wallet_data_dir = ""
         self.wallet_cli_path = ""
+        self.wallet_handle = None
         self.alias_prefix = None
         self.headers = None
         self.new_txs = []
@@ -38,6 +39,8 @@ class configurator:
             if "wallet_cli_path" in loaded_params and loaded_params["wallet_cli_path"] not in ({}, [], "", None):
                 self.wallet_cli_path = loaded_params["wallet_cli_path"]
                 print("'{}' found : {}".format("wallet_cli_path", self.wallet_cli_path))
+            if self.wallet_data_dir and self.wallet_cli_path:
+                self.wallet_handle = wallet(data_dir=self.wallet_data_dir, cli_path=self.wallet_cli_path)
             if "alias_prefix" in loaded_params and loaded_params["alias_prefix"] not in ({}, [], "", None):
                 self.alias_prefix = loaded_params["alias_prefix"]
                 print("'{}' found : {}".format("alias_prefix", self.alias_prefix))
@@ -66,7 +69,11 @@ class configurator:
         self.set_ticker()
         self.set_alias_prefix()
         self.set_header()
-        self.set_new_txs()
+        if prompt_confirmation("Do you want to use the wallet interface to set transactions ? (y/n) : "):
+            self.set_new_txs()
+        else:
+            print("\nWallet setup cancelled!\n"
+                  "Please enter the transactions manually in params.json before restarting\n")
 
     def save_params_json(self, reload=False):
 
@@ -111,48 +118,38 @@ class configurator:
 
     def set_new_txs(self):
         # Transactions list for MN creation
-        if prompt_confirmation("Do you want to use the wallet interface to set transactions ? (y/n) : "):
-            if self.wallet_data_dir and self.wallet_cli_path:
-                wallet_handle = wallet(data_dir=self.wallet_data_dir, cli_path=self.wallet_cli_path)
-                if wallet_handle.check_server():
-                    self.new_txs = json.loads(wallet_handle.get_masternode_outputs())
-                    print("Transactions retrieved from wallet:\n"
-                          "{}".format(self.new_txs))
-                else:
-                    print("Cannot connect to wallet.\n"
-                          "Please check your wallet configuration or enter the transactions manually in params.json\n")
-                    sys.exit(0)
+        # These 2 'If' conditions need to be separate. We first check for handle then we check connection with wallet
+        if self.wallet_handle:
+            if self.wallet_handle.check_server():
+                self.new_txs = json.loads(self.wallet_handle.get_masternode_outputs())
+                print("Transactions retrieved from wallet:\n"
+                      "{}".format(self.new_txs))
             else:
-                if prompt_confirmation("Handles missing. Do you wish to setup the wallet handles now ? (y/n) : "):
-                    self.set_wallet_handles()
-                    self.set_new_txs()
-                else:
-                    sys.exit(0)
+                print("Cannot connect to wallet.\n"
+                      "Please check your wallet configuration or enter the transactions manually in params.json\n")
+                sys.exit(0)
         else:
-            print("\nWallet setup cancelled!\n"
-                  "Please enter the transactions manually in params.json before restarting\n")
-            sys.exit(0)
+            print("Wallet handle missing.")
+            self.set_wallet_handle()
+            self.set_new_txs()
 
-    def set_wallet_handles(self):
+    def set_wallet_handle(self):
         # Setup the wallet handle to get transaction from the wallet
         if not self.wallet_data_dir:
-            self.set_wallet_data_dir()
+            self.wallet_data_dir = input("Input the path to {} data directory : ".format(self.ticker))
         if not self.wallet_cli_path:
-            self.set_wallet_cli_path()
+            self.wallet_cli_path = input("Input the path to the {} cli binary : ".format(self.ticker))
 
-        if self.wallet_data_dir == "" or self.wallet_cli_path == "":
+        # Initiate the wallet handle if the paths are not empty
+        if self.wallet_data_dir not in ({}, [], "", None) and self.wallet_cli_path not in ({}, [], "", None):
+            self.wallet_handle = wallet(data_dir=self.wallet_data_dir, cli_path=self.wallet_cli_path)
+        else:
             if prompt_confirmation("Entered paths to the data directory and/or cli binary are empty !\n"
                                    "Do you wish to Cancel wallet setup ? (y/n) : "):
                 print("\nWallet setup cancelled!\n"
                       "Please enter the transactions manually in params.json before restarting\n")
+                # Save before exit to keep data that was added during config
+                self.save_params_json()
                 sys.exit(0)
             else:
-                self.set_wallet_handles()
-
-    def set_wallet_data_dir(self):
-        self.wallet_data_dir = input("Input the path to {} data directory : ".format(self.ticker))
-        return self.wallet_data_dir
-
-    def set_wallet_cli_path(self):
-        self.wallet_cli_path = _input = input("Input the path to the {} cli binary : ".format(self.ticker))
-        return self.wallet_cli_path
+                self.set_wallet_handle()

@@ -24,6 +24,6 @@ def checks():
     #################################
 
     if prompt_confirmation("Do you want to save masternode.conf file ? (y/n) : "):
-        command.save_masternode_conf()
+        command.save_masternodes_conf()
     else:
         print("Save cancelled.")

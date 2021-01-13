@@ -46,48 +46,50 @@ class ihostmn:
             conf = masternode["masternode_conf_text"]
             self.masternodes_conf += conf + "\n"
 
-    def save_masternode_conf(self):
+    def save_masternodes_conf(self):
         if self.masternodes_conf is None:
             self.get_masternodes_conf()
         with open('masternode.conf', 'w') as file:
             file.write(self.masternodes_conf)
         print("masternode.conf saved to {}".format(os.getcwd()))
 
-    def delete_masternodes(self):
+    def delete_all_masternodes(self):
         if self.masternodes_list is None:
             self.get_masternodes_list()
         for masternode in self.masternodes_list:
-            id_ = masternode["id"]
-            alias = masternode["alias"]
-            resp = requests.post("https://ihostmn.com/api/v1/hosting/user/delete_masternode",
-                                 params={"id": id_},
-                                 headers=self.config.headers)
-            data = resp.json()
-            if data["error"] != "":
-                print(data["error"])
-                sys.exit(1)
-            else:
-                if data["result"]["deleted"] == 1:
-                    print("Masternode {}-{} deleted\n".format(id_, alias))
+            self.delete_masternode(id_=masternode["id"], alias=masternode["alias"])
+
+    def delete_masternode(self, id_, alias):
+        resp = requests.post("https://ihostmn.com/api/v1/hosting/user/delete_masternode",
+                             params={"id": id_},
+                             headers=self.config.headers)
+        data = resp.json()
+        if data["error"] != "":
+            print(data["error"])
+            sys.exit(1)
+        else:
+            if data["result"]["deleted"] == 1:
+                print("Masternode {}-{} deleted\n".format(id_, alias))
 
     def create_masternodes(self):
         if self.masternodes_list is None:
             self.get_masternodes_list()
         created_new_mn = False
-        if self.config.new_txs and self.config.new_txs not in ({}, [], "", None):
+        if self.config.new_txs not in ({}, [], "", None):
             if prompt_confirmation("Transactions found, create Masternodes now ? (y/n) : "):
-                mn_counter = 1
+                mn_counter = 0  # Init value to 0
                 for tx in self.config.new_txs:
+                    mn_counter += 1
                     alias = self.config.alias_prefix + str(mn_counter)
                     # Check if the transaction is already used in another MN
                     # Useful for the --create option
                     if tx["txhash"] in [mn["transaction_id"] for mn in self.masternodes_list]:
                         print("Transaction : {}\nalready used for another Masternode. Skipping.\n".format(tx["txhash"]))
                     else:
-                        if alias in [mn["alias"] for mn in self.masternodes_list]:
-                            mn_counter += 1
+                        # Now we check if the alias is not used for another MN
+                        while alias in [mn["alias"] for mn in self.masternodes_list]:
+                            mn_counter += 1  # If the alias is there, we increment the counter and create a new alias
                             alias = self.config.alias_prefix + str(mn_counter)
-                        # Now we are sure the tx and the alias are not used in another MN
                         self.create_masternode(tx, alias)
                         created_new_mn = True
                 if not created_new_mn:
@@ -151,9 +153,19 @@ class ihostmn:
         for mn in self.masternodes_list:
             heights.append(mn["local_blocks"])
             heights.append(mn["remote_blocks"])
-        if len(set(heights)) > 1:
-            print(f"{bcolors.WARN}Warning: Some block heights are inconsistent, "
-                  f"some Masternodes may need reindexing{bcolors.ENDC}\n")
+        # If the wallet handle is set, check wallet block height
+        if self.config.wallet_handle and self.config.wallet_handle.check_server():
+            wb = self.config.wallet_handle.get_last_block()
+            wbh = self.config.wallet_handle.get_block_hash(wb)
+            print("Wallet block height : \n"
+                  "| block height : {}\n"
+                  "| block hash   : {}\n".format(wb, wbh))
+            heights.append(int(wb))
+        else:
+            print("Wallet handle not set. Skipping checks on wallet block height."
+                  "Use option --configure to setup wallet handle.\n")
+        if len(set(heights)) > 5:
+            print(f"{bcolors.WARN}! Block heights inconsistent, some Masternodes may need reindexing !{bcolors.ENDC}\n")
             if prompt_confirmation("Reindex now ? ? (y/n) : "):
                 self.reindex_all_masternodes()
             else:

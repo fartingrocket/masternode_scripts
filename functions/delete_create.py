@@ -26,7 +26,7 @@ def delete_all_masternodes() -> bool:
     #################################
 
     if prompt_confirmation("Are you sure you want to delete all masternodes ? (y/n) : "):
-        command.delete_masternodes()
+        command.delete_all_masternodes()
         return True
     else:
         print("Deletion cancelled.\n")
@@ -54,4 +54,4 @@ def create_new_masternodes():
 
     command.print_masternodes()
 
-    command.save_masternode_conf()
+    command.save_masternodes_conf()
