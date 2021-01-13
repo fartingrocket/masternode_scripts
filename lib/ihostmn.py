@@ -11,7 +11,6 @@ class ihostmn:
     def __init__(self):
         self.config = configurator()
         self.config.load()
-        self.balance = None
         self.masternodes_list = None
         self.masternodes_conf = None
 
@@ -22,8 +21,19 @@ class ihostmn:
             print(data["error"])
             sys.exit(1)
         else:
-            self.balance = data["result"]["balance"]
-            return self.balance
+            return data["result"]["balance"]
+
+    @staticmethod
+    def get_hosting_price(ticker) -> float:
+        resp = requests.get("https://ihostmn.com/api/v1/hosting/public/list_all_coins")
+        data = resp.json()
+        if data["error"] != "":
+            print(data["error"])
+            sys.exit(1)
+        else:
+            for coin in data["result"]["coins"]:
+                if coin["ticker"] == ticker:
+                    return coin["ticker"]
 
     def get_masternodes_list(self):
         _list = []
@@ -57,9 +67,9 @@ class ihostmn:
         if self.masternodes_list is None:
             self.get_masternodes_list()
         for masternode in self.masternodes_list:
-            self.delete_masternode(id_=masternode["id"], alias=masternode["alias"])
+            self.delete_masternode(alias=masternode["alias"], id_=masternode["id"])
 
-    def delete_masternode(self, id_, alias):
+    def delete_masternode(self, alias, id_):
         resp = requests.post("https://ihostmn.com/api/v1/hosting/user/delete_masternode",
                              params={"id": id_},
                              headers=self.config.headers)
@@ -108,20 +118,25 @@ class ihostmn:
     def create_masternode(self, tx, alias):
         tx_id = tx["txhash"]
         tx_index = tx["outputidx"]
-        resp = requests.post("https://ihostmn.com/api/v1/hosting/user/create_new_masternode",
-                             params={"cointicker": self.config.ticker,
-                                     "alias": alias,
-                                     "txid": tx_id,
-                                     "txindex": tx_index,
-                                     "dip": 0},
-                             headers=self.config.headers)
-        data = resp.json()
-        if data["error"] != "":
-            print(data["error"])
-            sys.exit(1)
+        # Check if sufficient balance before creating masternode
+        if float(self.get_balance()) > self.get_hosting_price(self.config.ticker):
+            resp = requests.post("https://ihostmn.com/api/v1/hosting/user/create_new_masternode",
+                                 params={"cointicker": self.config.ticker,
+                                         "alias": alias,
+                                         "txid": tx_id,
+                                         "txindex": tx_index,
+                                         "dip": 0},
+                                 headers=self.config.headers)
+            data = resp.json()
+            if data["error"] != "":
+                print(data["error"])
+                sys.exit(1)
+            else:
+                new_id = data["result"]["id"]
+                print("Masternode {} with ID {} created\n".format(alias, new_id))
         else:
-            new_id = data["result"]["id"]
-            print("Masternode {} with ID {} created\n".format(alias, new_id))
+            print("Insufficient Balance ! Cannot create Masternode. Leaving.\n")
+            sys.exit(0)
 
     def reindex_all_masternodes(self):
         if self.masternodes_list is None:

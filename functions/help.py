@@ -5,7 +5,7 @@ help_string = "\nmasternode_scripts.py:\n" \
               "\t         -> Use at your own risk. No guarantees.\n" \
               "\nUsage:\n" \
               "\t       python3 masternode_scripts.py [option]\n" \
-              "\t       only one option at a time is allowed\n" \
+              "\t       only one option at a time is allowed, except for --delete where arguments are required.\n" \
               "\nExamples:\n" \
               "\t       python3 masternode_scripts.py --checks\n" \
               "\nparams.json file:\n" \
@@ -19,14 +19,19 @@ help_string = "\nmasternode_scripts.py:\n" \
               "\t-h \t--help       \tGet this menu.\n\n" \
               "\t-g \t--configure  \tStarts the configuration manager\n" \
               "\t\t\t        helps creating the params.json file.\n\n" \
-              "\t-c \t--checks     \tDo checks on balance and existing masternodes\n" \
+              "\t-k \t--checks     \tDo checks on balance and existing masternodes\n" \
               "\t\t\t        offers the possibility to save masternode.conf file.\n\n" \
-              "\t-d \t--delete     \tDelete all existing masternodes.\n" \
+              "\t-d \t--delete     \tDelete one masternodes. must specify alias and id :\n\n" \
+              "\t\t\t        > python3 masternode_scrypts.py --delete --alias=MN1 --id=12345\n" \
+              "\t\t\t        or\n" \
+              "\t\t\t        > python3 masternode_scrypts.py -d -a MN1 -i 12345\n\n" \
+              "\t\t\t        Correct ticker must be in params.json\n" \
+              "\t-d \t--delete-all \tDelete all existing masternodes.\n" \
               "\t\t\t        must specify correct ticker in params.json\n\n" \
               "\t-r \t--create     \tCreate new masternodes with transactions\n" \
               "\t\t\t        uses transactions from params.json\n" \
               "\t\t\t        save masternode.conf file automatically at the end.\n\n" \
-              "\t-dr\t--delcreate \tDelete old masternodes and create new ones\n" \
+              "\t-t\t--delcreate   \tDelete old masternodes and create new ones\n" \
               "\t\t\t        uses transactions from params.json\n" \
               "\t\t\t        save masternode.conf file automatically at the end.\n\n" \
               "\t-i \t--reindex    \tReindex all existing masternodes wallets\n" \

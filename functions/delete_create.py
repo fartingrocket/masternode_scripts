@@ -33,6 +33,21 @@ def delete_all_masternodes() -> bool:
         return False
 
 
+def delete_one_masternode(alias, id_) -> bool:
+    command = ihostmn()
+
+    #################################
+    print("#### Deleting masternode ####################################\n")
+    #################################
+
+    if prompt_confirmation("Are you sure you want to delete masternode {} : {} ? (y/n) : ".format(alias, id_)):
+        command.delete_masternode(alias, id_)
+        return True
+    else:
+        print("Deletion cancelled.\n")
+        return False
+
+
 def create_new_masternodes():
     command = ihostmn()
 
