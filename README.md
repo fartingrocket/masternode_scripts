@@ -48,7 +48,8 @@ masternode_scripts is a script to do all the tedious job when there is a collate
 > python3 masternode_scripts.py [option]
 ```
 
-only one option at a time is allowed
+Only one option at a time is allowed, except for --delete where arguments are required.
+
 
 # Examples:
 
