@@ -1,4 +1,5 @@
 # General description:
+
 masternode_scripts is a script to do all the tedious job when there is a collateral change
 
 * Work in progress, please don't mind the bugs (You are welcome to do a Pull Request)
@@ -9,27 +10,36 @@ masternode_scripts is a script to do all the tedious job when there is a collate
 # Options:
 
 ```
+
   -h      --help          Get this menu.
 
   -g      --configure     Starts the configuration manager
                           helps creating the params.json file.
 
-  -c      --checks        Do checks on balance and existing masternodes
+  -k      --checks        Do checks on balance and existing masternodes
                           offers the possibility to save masternode.conf file.
 
-  -d      --delete        Delete all existing masternodes.
+  -d      --delete        Delete one masternodes. must specify alias and id :
+
+                          > python3 masternode_scrypts.py --delete --alias=MN1 --id=12345
+                          or
+                          > python3 masternode_scrypts.py -d -a MN1 -i 12345
+
+                          Correct ticker must be in params.json
+  -d      --delete-all    Delete all existing masternodes.
                           must specify correct ticker in params.json
 
   -r      --create        Create new masternodes with transactions
                           uses transactions from params.json
                           save masternode.conf file automatically at the end.
 
-  -dr     --delcreate     Delete old masternodes and create new ones
+  -t      --delcreate     Delete old masternodes and create new ones
                           uses transactions from params.json
                           save masternode.conf file automatically at the end.
 
   -i      --reindex       Reindex all existing masternodes wallets
                           gives the option to reindex only some of them.
+
 ```
 
 # Usage:
@@ -115,6 +125,7 @@ The file contains all the parameters needed to use the different functions
   2) Using the daemon, you can retrieve the transactions using the configurator (see : How to setup the wallet handles)
   
 # How to setup the wallet handles:
+
 You should either run the wallet daemon with a -server parameter or add parameters `daemon=1` and `server=1`
 to the wallet.conf file of your wallet. This will yield the same result.
 
