@@ -182,17 +182,18 @@ class ihostmn:
             print("Wallet block height : \n"
                   "| block height : {}\n"
                   "| block hash   : {}\n".format(wb, wbh))
-            # check if wallet and MNs are on same chain
+            # We take the lowest block number between the wallet blocks and MNs highest for our hash checks
             h = int(wb) if heights[-1] > int(wb) else heights[-1]
             # We append wallet block height, remove repetitions and sort again
             heights.append(int(wb))
             heights = list(set(heights))
             heights.sort()
-            different_chain = (self.get_block_info_by_height(h)["hash"] != wbh)
+            # Check if wallet and MNs on different chains
+            different_chain = (self.get_block_info_by_height(h)["hash"] != self.config.wallet_handle.get_block_hash(str(h)))
             if different_chain:
                 print(f"{bcolors.WARN}! Wallet and Masternodes appear to be on different chains !{bcolors.ENDC}\n")
             else:
-                print(f"{bcolors.BLUE}YAY, Wallet and masternodes on same chain, all good.{bcolors.ENDC}\n")
+                print(f"{bcolors.BLUE}YAY, Wallet and Masternodes on same chain, all good.{bcolors.ENDC}\n")
             need_reindexing = True if (heights[-1] - heights[0] > 5 or different_chain) else False
         else:
             print("Wallet handle not set. Skipping checks on wallet block height."
