@@ -2,6 +2,8 @@ import sys
 import requests
 import os
 import bcolors
+from typing import List
+
 from lib.configurator import configurator
 from lib.prompt import prompt_confirmation
 
@@ -164,10 +166,15 @@ class ihostmn:
     def check_block_height(self):
         if self.masternodes_list is None:
             self.get_masternodes_list()
-        heights = []
+        heights = list()
+        different_chain = False
+        need_reindexing = False
         for mn in self.masternodes_list:
             heights.append(mn["local_blocks"])
             heights.append(mn["remote_blocks"])
+        # Remove repetitions and sort
+        heights = list(set(heights))
+        heights.sort()
         # If the wallet handle is set, check wallet block height
         if self.config.wallet_handle and self.config.wallet_handle.check_server():
             wb = self.config.wallet_handle.get_last_block()
@@ -175,16 +182,40 @@ class ihostmn:
             print("Wallet block height : \n"
                   "| block height : {}\n"
                   "| block hash   : {}\n".format(wb, wbh))
+            # check if wallet and MNs are on same chain
+            h = int(wb) if heights[-1] > int(wb) else heights[-1]
+            # We append wallet block height, remove repetitions and sort again
             heights.append(int(wb))
+            heights = list(set(heights))
+            heights.sort()
+            different_chain = (self.get_block_info_by_height(h)["hash"] != wbh)
+            if different_chain:
+                print(f"{bcolors.WARN}! Wallet and Masternodes appear to be on different chains !{bcolors.ENDC}\n")
+            else:
+                print(f"{bcolors.BLUE}YAY, Wallet and masternodes on same chain, all good.{bcolors.ENDC}\n")
+            need_reindexing = True if (heights[-1] - heights[0] > 5 or different_chain) else False
         else:
             print("Wallet handle not set. Skipping checks on wallet block height."
                   "Use option --configure to setup wallet handle.\n")
-        if len(set(heights)) > 5:
+            # In case wallet handle is not set, we check block heights on MNs only
+            need_reindexing = True if heights[-1] - heights[0] > 5 else False
+
+        if need_reindexing:
             print(f"{bcolors.WARN}! Block heights inconsistent, some Masternodes may need reindexing !{bcolors.ENDC}\n")
             if prompt_confirmation("Reindex now ? ? (y/n) : "):
                 self.reindex_all_masternodes()
             else:
                 print("Reindex cancelled\n")
+
+    def get_block_info_by_height(self, height):
+        resp = requests.get("https://ihostmn.com/api/v1/coinstats/public/getblock",
+                            params={"ticker": self.config.ticker, "index": height})
+        data = resp.json()
+        if data["error"] != "":
+            print(data["error"])
+            sys.exit(1)
+        else:
+            return data["result"]["block_info"]
 
     def print_masternodes(self):
         if self.masternodes_list is None:
