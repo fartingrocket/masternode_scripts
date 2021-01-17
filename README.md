@@ -20,12 +20,11 @@ masternode_scripts is a script to do all the tedious job when there is a collate
                           offers the possibility to save masternode.conf file.
 
   -d      --delete        Delete one masternodes. must specify alias and id :
-
-                          > python3 masternode_scrypts.py --delete --alias=MN1 --id=12345
-                          or
-                          > python3 masternode_scrypts.py -d -a MN1 -i 12345
-
+                            > python3 masternode_scrypts.py --delete --alias=MN1 --id=12345
+                            or
+                            > python3 masternode_scrypts.py -d -a MN1 -i 12345
                           Correct ticker must be in params.json
+                          
   -d      --delete-all    Delete all existing masternodes.
                           must specify correct ticker in params.json
 
