@@ -11,7 +11,7 @@ def reindex_masternodes():
 
     command.print_masternodes()
 
-    if prompt_confirmation("Do you want to reindex all or individually ? 'y' for all (y/n) : "):
+    if prompt_confirmation("Do you want to reindex all or individually ? 'a' for all", true_value="a", false_value="i", default="i"):
         command.reindex_all_masternodes()
     else:
         id_ = input("Please input the index (Leave empty and press 'Enter' to quit): ")

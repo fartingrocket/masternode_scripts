@@ -1,8 +1,8 @@
-import sys
-import requests
 import os
+import sys
+
 import bcolors
-from typing import List
+import requests
 
 from lib.configurator import configurator
 from lib.prompt import prompt_confirmation
@@ -88,7 +88,7 @@ class ihostmn:
             self.get_masternodes_list()
         created_new_mn = False
         if self.config.new_txs not in ({}, [], "", None):
-            if prompt_confirmation("Transactions found, create Masternodes now ? (y/n) : "):
+            if prompt_confirmation("Transactions found, create Masternodes now ?", default="y"):
                 mn_counter = 0  # Init value to 0
                 for tx in self.config.new_txs:
                     mn_counter += 1
@@ -167,8 +167,6 @@ class ihostmn:
         if self.masternodes_list is None:
             self.get_masternodes_list()
         heights = list()
-        different_chain = False
-        need_reindexing = False
         for mn in self.masternodes_list:
             heights.append(mn["local_blocks"])
             heights.append(mn["remote_blocks"])
@@ -203,7 +201,7 @@ class ihostmn:
 
         if need_reindexing:
             print(f"{bcolors.WARN}! Block heights inconsistent, some Masternodes may need reindexing !{bcolors.ENDC}\n")
-            if prompt_confirmation("Reindex now ? ? (y/n) : "):
+            if prompt_confirmation("Reindex now ?", default="n"):
                 self.reindex_all_masternodes()
             else:
                 print("Reindex cancelled\n")

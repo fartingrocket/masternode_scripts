@@ -69,7 +69,7 @@ class configurator:
         self.set_ticker()
         self.set_alias_prefix()
         self.set_header()
-        if prompt_confirmation("Do you want to use the wallet interface to set transactions ? (y/n) : "):
+        if prompt_confirmation("Do you want to use the wallet interface to set transactions ?", default="y"):
             self.set_new_txs()
         else:
             print("\nWallet setup cancelled!\n"
@@ -145,7 +145,7 @@ class configurator:
             self.wallet_handle = wallet(data_dir=self.wallet_data_dir, cli_path=self.wallet_cli_path)
         else:
             if prompt_confirmation("Entered paths to the data directory and/or cli binary are empty !\n"
-                                   "Do you wish to Cancel wallet setup ? (y/n) : "):
+                                   "Do you wish to Cancel wallet setup ?", default="y"):
                 print("\nWallet setup cancelled!\n"
                       "Please enter the transactions manually in params.json before restarting\n")
                 # Save before exit to keep data that was added during config

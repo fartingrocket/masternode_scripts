@@ -1,9 +1,10 @@
 import getopt
-from functions.configure import configure
+
 from functions.checks import checks
+from functions.configure import configure
 from functions.delete_create import *
-from functions.reindex import reindex_masternodes
 from functions.help import help_string
+from functions.reindex import reindex_masternodes
 
 
 def main(argv):
@@ -42,4 +43,9 @@ def main(argv):
 
 
 if __name__ == "__main__":
+
+    if len(sys.argv) < 2:
+        print("Missing arguments. use <masternode_scripts.py -h> for help")
+        sys.exit(2)
+
     main(sys.argv[1:])

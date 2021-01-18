@@ -8,7 +8,7 @@ def configure():
     print("#### Starting configuration manager #####################\n")
     #################################
     config = configurator()
-    if prompt_confirmation("Do you want to load an existing params.json to complete missing params ? (y/n) : "):
+    if prompt_confirmation("Do you want to load an existing params.json to complete missing params ?", default="y"):
         config.load()
         if config.new_txs in ({}, [], "", None):
             print("Missing transactions!")

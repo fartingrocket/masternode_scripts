@@ -1,7 +1,8 @@
 import sys
+
 from lib.ihostmn import ihostmn
-from functions.progress_bar import print_progress
 from lib.prompt import prompt_confirmation
+from .progress_bar import print_progress
 
 
 def delete_all_and_create():
@@ -11,7 +12,7 @@ def delete_all_and_create():
         print_progress(30)
     else:
         # End here if deletion cancelled
-        if not prompt_confirmation("Do you still wish to proceed to create new Masternodes ? (y/n) : "):
+        if not prompt_confirmation("Do you still wish to proceed and create new Masternodes ?", default="n"):
             print("Masternode creation cancelled. Aborting.\n")
             sys.exit(0)
 
@@ -25,7 +26,7 @@ def delete_all_masternodes() -> bool:
     print("#### Deleting old masternodes ###############################\n")
     #################################
 
-    if prompt_confirmation("Are you sure you want to delete all masternodes ? (y/n) : "):
+    if prompt_confirmation("Are you sure you want to delete all masternodes ?", default="n"):
         command.delete_all_masternodes()
         return True
     else:
@@ -40,7 +41,7 @@ def delete_one_masternode(alias, id_) -> bool:
     print("#### Deleting masternode ####################################\n")
     #################################
 
-    if prompt_confirmation("Are you sure you want to delete masternode {} : {} ? (y/n) : ".format(alias, id_)):
+    if prompt_confirmation("Are you sure you want to delete masternode {} : {} ?".format(alias, id_), default="n"):
         command.delete_masternode(alias, id_)
         return True
     else:

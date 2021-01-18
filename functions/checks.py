@@ -23,7 +23,7 @@ def checks():
     print("#### Save masternode.conf ##############################\n")
     #################################
 
-    if prompt_confirmation("Do you want to save masternode.conf file ? (y/n) : "):
+    if prompt_confirmation("Do you want to save masternode.conf file ?", default="n"):
         command.save_masternodes_conf()
     else:
         print("Save cancelled.")
