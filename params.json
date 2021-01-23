@@ -1,6 +1,7 @@
 {
   "ticker": "777",
-  "alias_prefix": "MN",
+  "wallet_data_dir": "path to wallet data directory here",
+  "wallet_cli_path": "path to wallet cli here, include the cli binary in the path"
   "header": {
     "IHOSTMN-API-KEY": "Your API KEY here"
   },
