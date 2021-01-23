@@ -28,7 +28,7 @@ help_string = "\nmasternode_scripts.py:\n" \
               "\t\t\t        or\n" \
               "\t\t\t        > python3 masternode_scrypts.py -d -a MN1 -i 12345\n\n" \
               "\t\t\t        Correct ticker must be in params.json\n" \
-              "\t-d \t--delete-all \tDelete all existing masternodes.\n" \
+              "\t-x \t--delete-all \tDelete all existing masternodes.\n" \
               "\t\t\t        must specify correct ticker in params.json\n\n" \
               "\t-r \t--create     \tCreate new masternodes with transactions\n" \
               "\t\t\t        uses transactions from params.json\n" \

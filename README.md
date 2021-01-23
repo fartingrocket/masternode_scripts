@@ -25,7 +25,7 @@ masternode_scripts is a script to do all the tedious job when there is a collate
                             > python3 masternode_scrypts.py -d -a MN1 -i 12345
                           Correct ticker must be in params.json
                           
-  -d      --delete-all    Delete all existing masternodes.
+  -x      --delete-all    Delete all existing masternodes.
                           must specify correct ticker in params.json
 
   -r      --create        Create new masternodes with transactions
