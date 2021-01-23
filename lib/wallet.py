@@ -1,3 +1,4 @@
+import json
 import subprocess
 
 
@@ -47,3 +48,13 @@ class wallet:
             return get_block_hash.stdout.decode().rstrip()
         else:
             return None
+
+    def get_alias(self, tx_hash=None, tx_index=None):
+
+        list_unspent = subprocess.run(
+            [self.cli_path, "-datadir=" + self.data_dir, "listunspent"],
+            stdout=subprocess.PIPE)
+
+        for tx in json.loads(list_unspent.stdout.decode()):
+            if tx["txid"] == tx_hash and tx["vout"] == tx_index:
+                return tx["account"]

@@ -17,7 +17,6 @@ class configurator:
         self.wallet_data_dir = ""
         self.wallet_cli_path = ""
         self.wallet_handle = None
-        self.alias_prefix = None
         self.headers = None
         self.new_txs = []
 
@@ -41,12 +40,6 @@ class configurator:
                 print("'{}' found : {}".format("wallet_cli_path", self.wallet_cli_path))
             if self.wallet_data_dir and self.wallet_cli_path:
                 self.wallet_handle = wallet(data_dir=self.wallet_data_dir, cli_path=self.wallet_cli_path)
-            if "alias_prefix" in loaded_params and loaded_params["alias_prefix"] not in ({}, [], "", None):
-                self.alias_prefix = loaded_params["alias_prefix"]
-                print("'{}' found : {}".format("alias_prefix", self.alias_prefix))
-            else:
-                print("Missing param 'alias_prefix' in the params.json")
-                self.set_alias_prefix()
             if "headers" in loaded_params and loaded_params["headers"] not in ({}, [], "", None):
                 self.headers = loaded_params["headers"]
                 print("'{}' found : {}".format("headers", self.headers))
@@ -67,7 +60,6 @@ class configurator:
     def prompt_params_creation(self):
 
         self.set_ticker()
-        self.set_alias_prefix()
         self.set_header()
         if prompt_confirmation("Do you want to use the wallet interface to set transactions ?", default="y"):
             self.set_new_txs()
@@ -85,7 +77,6 @@ class configurator:
             "ticker": self.ticker,
             "wallet_data_dir": self.wallet_data_dir,
             "wallet_cli_path": self.wallet_cli_path,
-            "alias_prefix": self.alias_prefix,
             "headers": {"IHOSTMN-API-KEY": _api_key},
             "new_txs": self.new_txs
         }
@@ -103,12 +94,6 @@ class configurator:
         while not self.ticker:
             self.ticker = input("Input ticker (ex.: SAPP): ").upper()
         return self.ticker
-
-    def set_alias_prefix(self):
-        # Alias prefix
-        inp_alias = input("Input alias prefix for masternodes (Press enter for default = 'MN') : ").upper()
-        self.alias_prefix = "MN" if not inp_alias else inp_alias
-        return self.alias_prefix
 
     def set_header(self):
         # IHOSTMN-API-KEY

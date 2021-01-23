@@ -15,7 +15,7 @@ def checks():
     print("#### List all Masternodes ###############################\n")
     #################################
 
-    command.print_masternodes()
+    mns = command.print_masternodes()
 
     command.check_block_height()
 
@@ -23,7 +23,9 @@ def checks():
     print("#### Save masternode.conf ##############################\n")
     #################################
 
-    if prompt_confirmation("Do you want to save masternode.conf file ?", default="n"):
+    if mns and prompt_confirmation("Do you want to save masternode.conf file ?", default="n"):
         command.save_masternodes_conf()
+    elif not mns:
+        print("No masternodes configuration to save.\n")
     else:
-        print("Save cancelled.")
+        print("Save cancelled.\n")

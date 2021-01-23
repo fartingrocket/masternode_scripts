@@ -35,7 +35,7 @@ class ihostmn:
         else:
             for coin in data["result"]["coins"]:
                 if coin["ticker"] == ticker:
-                    return coin["ticker"]
+                    return coin["hosting_price"]
 
     def get_masternodes_list(self):
         _list = []
@@ -89,19 +89,13 @@ class ihostmn:
         created_new_mn = False
         if self.config.new_txs not in ({}, [], "", None):
             if prompt_confirmation("Transactions found, create Masternodes now ?", default="y"):
-                mn_counter = 0  # Init value to 0
                 for tx in self.config.new_txs:
-                    mn_counter += 1
-                    alias = self.config.alias_prefix + str(mn_counter)
+                    alias = self.config.wallet_handle.get_alias(tx_hash=tx["txhash"], tx_index=tx["outputidx"])
                     # Check if the transaction is already used in another MN
                     # Useful for the --create option
                     if tx["txhash"] in [mn["transaction_id"] for mn in self.masternodes_list]:
                         print("Transaction : {}\nalready used for another Masternode. Skipping.\n".format(tx["txhash"]))
                     else:
-                        # Now we check if the alias is not used for another MN
-                        while alias in [mn["alias"] for mn in self.masternodes_list]:
-                            mn_counter += 1  # If the alias is there, we increment the counter and create a new alias
-                            alias = self.config.alias_prefix + str(mn_counter)
                         self.create_masternode(tx, alias)
                         created_new_mn = True
                 if not created_new_mn:
@@ -114,14 +108,18 @@ class ihostmn:
             # End here if no transactions in params.json
             print("Missing transactions!")
             self.config.set_new_txs()
-            self.config.save_params_json()
-            self.create_masternodes()
+            if self.config.new_txs not in ({}, [], "", None):
+                self.config.save_params_json()
+                self.create_masternodes()
+            else:
+                print("Unable to find any transactions in wallet. Please check your wallet.\n")
+                sys.exit(0)
 
     def create_masternode(self, tx, alias):
         tx_id = tx["txhash"]
         tx_index = tx["outputidx"]
         # Check if sufficient balance before creating masternode
-        if float(self.get_balance()) > self.get_hosting_price(self.config.ticker):
+        if float(self.get_balance()) > float(self.get_hosting_price(self.config.ticker)):
             resp = requests.post("https://ihostmn.com/api/v1/hosting/user/create_new_masternode",
                                  params={"cointicker": self.config.ticker,
                                          "alias": alias,
@@ -138,6 +136,7 @@ class ihostmn:
                 print("Masternode {} with ID {} created\n".format(alias, new_id))
         else:
             print("Insufficient Balance ! Cannot create Masternode. Leaving.\n")
+            print(self.get_balance(), self.get_hosting_price(self.config.ticker))
             sys.exit(0)
 
     def reindex_all_masternodes(self):
@@ -180,19 +179,23 @@ class ihostmn:
             print("Wallet block height : \n"
                   "| block height : {}\n"
                   "| block hash   : {}\n".format(wb, wbh))
-            # We take the lowest block number between the wallet blocks and MNs highest for our hash checks
-            h = int(wb) if heights[-1] > int(wb) else heights[-1]
-            # We append wallet block height, remove repetitions and sort again
-            heights.append(int(wb))
-            heights = list(set(heights))
-            heights.sort()
-            # Check if wallet and MNs on different chains
-            different_chain = (self.get_block_info_by_height(h)["hash"] != self.config.wallet_handle.get_block_hash(str(h)))
-            if different_chain:
-                print(f"{bcolors.WARN}! Wallet and Masternodes appear to be on different chains !{bcolors.ENDC}\n")
+            # if there is no masternodes, no need for this
+            if heights:
+                # We take the lowest block number between the wallet blocks and MNs highest for our hash checks
+                h = int(wb) if heights[-1] > int(wb) else heights[-1]
+                # We append wallet block height, remove repetitions and sort again
+                heights.append(int(wb))
+                heights = list(set(heights))
+                heights.sort()
+                # Check if wallet and MNs on different chains
+                different_chain = (self.get_block_info_by_height(h)["hash"] != self.config.wallet_handle.get_block_hash(str(h)))
+                if different_chain:
+                    print(f"{bcolors.WARN}! Wallet and Masternodes appear to be on different chains !{bcolors.ENDC}\n")
+                else:
+                    print(f"{bcolors.BLUE}YAY, Wallet and Masternodes on same chain, all good.{bcolors.ENDC}\n")
+                need_reindexing = True if (heights[-1] - heights[0] > 5 or different_chain) else False
             else:
-                print(f"{bcolors.BLUE}YAY, Wallet and Masternodes on same chain, all good.{bcolors.ENDC}\n")
-            need_reindexing = True if (heights[-1] - heights[0] > 5 or different_chain) else False
+                need_reindexing = False
         else:
             print("Wallet handle not set. Skipping checks on wallet block height."
                   "Use option --configure to setup wallet handle.\n")
@@ -216,17 +219,22 @@ class ihostmn:
         else:
             return data["result"]["block_info"]
 
-    def print_masternodes(self):
+    def print_masternodes(self) -> bool:
         if self.masternodes_list is None:
             self.get_masternodes_list()
-        for mn in self.masternodes_list:
-            print("Masternode {}-{} : ticker {}\n"
-                  "| tx id        : {}\n"
-                  "| tx index     : {}\n"
-                  "| block height : {} peers\n"
-                  "| | local blocks  - {}\n"
-                  "| | remote blocks - {}\n".format(mn["alias"], mn["id"], mn["ticker"],
-                                                    mn["transaction_id"],
-                                                    mn["tx_index"],
-                                                    mn["peers"],
-                                                    mn["local_blocks"], mn["remote_blocks"]))
+
+        if self.masternodes_list:
+            for mn in self.masternodes_list:
+                print("Masternode {}-{} : ticker {}\n"
+                      "| tx id        : {}\n"
+                      "| tx index     : {}\n"
+                      "| block height : {} peers\n"
+                      "| | local blocks  - {}\n"
+                      "| | remote blocks - {}\n".format(mn["alias"], mn["id"], mn["ticker"],
+                                                        mn["transaction_id"],
+                                                        mn["tx_index"],
+                                                        mn["peers"],
+                                                        mn["local_blocks"], mn["remote_blocks"]))
+            return True
+        else:
+            return False

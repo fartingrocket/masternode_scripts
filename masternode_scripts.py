@@ -25,7 +25,9 @@ def main(argv):
         checks()
     elif opt in ("-d", "--delete") and len(opts) == 3:
         if opts[1][0] in ("-a", "--alias") and opts[2][0] in ("-i", "--id"):
-            delete_one_masternode(opts[1][1], opts[2][1])
+            delete_one_masternode(alias=opts[1][1], id_=opts[2][1])
+        elif opts[1][0] in ("-i", "--id") and opts[2][0] in ("-a", "--alias"):
+            delete_one_masternode(alias=opts[2][1], id_=opts[1][1])
         else:
             print("Missing or incorrect argument(s). use <masternode_scripts.py -h> for help")
             sys.exit(2)

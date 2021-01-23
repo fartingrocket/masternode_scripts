@@ -62,8 +62,8 @@ def create_new_masternodes():
     print("#### Getting Masternode.conf ###############################\n")
     #################################
 
-    # Waiting 120sec before retrieving conf file
-    print_progress(120)
+    # Waiting 180sec before retrieving conf file
+    print_progress(180)
 
     # Get the new masternodes IDs
     command.get_masternodes_list()
