@@ -1,4 +1,4 @@
-#General description
+# General description
 
 masternode_scripts is a script to do all the tedious job when there is a collateral change
 
@@ -7,7 +7,7 @@ masternode_scripts is a script to do all the tedious job when there is a collate
 * Requires python 3.6 or higher.
 * Use at your own risk. No guarantees.
 
-#Usage
+# Usage
 
 ```
 > python3 masternode_scripts.py [Argument] [option1] [option2] [option3]
@@ -15,7 +15,7 @@ masternode_scripts is a script to do all the tedious job when there is a collate
 
 see section [Arguments and Options](#arguments-and-options) and [Examples](#examples) for more details.
 
-#Arguments and Options
+# Arguments and Options
 
 ```
 
@@ -59,7 +59,7 @@ see section [Arguments and Options](#arguments-and-options) and [Examples](#exam
 
 ```
 
-#Examples
+# Examples
 
 ```
 > python3 masternode_scripts.py --checks --ticker=777
@@ -111,7 +111,7 @@ masternode.conf saved to ~/Documents/masternode_scripts
 
 Notice that the block checks will be skipped if the wallet handles are not set.
 
-#params file
+# params file
 
 The script comes with an integrated configurator that will help you generate the params.json file.
 
