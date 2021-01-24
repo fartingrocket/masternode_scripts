@@ -1,4 +1,4 @@
-# General description:
+#General description
 
 masternode_scripts is a script to do all the tedious job when there is a collateral change
 
@@ -7,7 +7,15 @@ masternode_scripts is a script to do all the tedious job when there is a collate
 * Requires python 3.6 or higher.
 * Use at your own risk. No guarantees.
 
-# Options:
+#Usage
+
+```
+> python3 masternode_scripts.py [Argument] [option1] [option2] [option3]
+```
+
+see section [Arguments and Options](#arguments-and-options) and [Examples](#examples) for more details.
+
+#Arguments and Options
 
 ```
 
@@ -16,44 +24,45 @@ masternode_scripts is a script to do all the tedious job when there is a collate
   -g      --configure     Starts the configuration manager
                           helps creating the params.json file.
 
-  -k      --checks        Do checks on balance and existing masternodes
-                          offers the possibility to save masternode.conf file.
+  -k      --checks        Do checks on balance and existing masternodes. Must specify 'ticker' :
+                          > python3 masternode_scrypts.py --checks --ticker=SAPP
+                          offers the possibility to save masternode.conf file at the end.
 
-  -d      --delete        Delete one masternodes. must specify alias and id :
-                            > python3 masternode_scrypts.py --delete --alias=MN1 --id=12345
-                            or
-                            > python3 masternode_scrypts.py -d -a MN1 -i 12345
-                          Correct ticker must be in params.json
-                          
-  -x      --delete-all    Delete all existing masternodes.
-                          must specify correct ticker in params.json
+  -n      --nextupdate    Calculates when the next update (collateral or reward) will occur.
+                          Must specify 'ticker' :
+                          > python3 masternode_scrypts.py --nextupdate --ticker=SAPP
+                          Requires the API parameters to be set correctly in params.json.
 
-  -r      --create        Create new masternodes with transactions
-                          uses transactions from params.json
-                          save masternode.conf file automatically at the end.
+  -d      --delete        Delete one masternode. Must specify 'ticker', 'alias' and 'id' :
+                          > python3 masternode_scrypts.py --delete --ticker=SAPP --alias=MN1 --id=12345
+                          or
+                          > python3 masternode_scrypts.py -d -e SAPP -a MN1 -i 12345
+                          Coin must be defined in params.json otherwise you will be prompted to configure it.
 
-  -t      --delcreate     Delete old masternodes and create new ones
-                          uses transactions from params.json
-                          save masternode.conf file automatically at the end.
+  -x      --delete-all    Delete all existing masternodes. Must specify 'ticker' :
+                          > python3 masternode_scrypts.py --delete-all --ticker=SAPP
+                          Coin must be defined in params.json otherwise you will be prompted to configure it.
 
-  -i      --reindex       Reindex all existing masternodes wallets
-                          gives the option to reindex only some of them.
+  -r      --create        Create new masternodes with transactions. Must specify 'ticker' :
+                          > python3 masternode_scrypts.py --create --ticker=SAPP
+                          Uses transactions from params.json if defined, otherwise you will be prompted
+                          to configure wallet handles
+                          Saves masternode.conf file automatically at the end.
 
-```
+  -t      --delcreate     Delete old masternodes and create new ones. Must specify 'ticker' :
+                          > python3 masternode_scrypts.py --delcreate --ticker=SAPP
+                          Coin must be defined in params.json otherwise you will be prompted to configure it.
+                          Saves masternode.conf file automatically at the end.
 
-# Usage:
-
-```
-> python3 masternode_scripts.py [option]
-```
-
-Only one option at a time is allowed, except for --delete where arguments are required.
-
-
-# Examples:
+  -i      --reindex       Reindex all existing masternodes wallets. Must specify 'ticker' :
+                          > python3 masternode_scrypts.py --reindex --ticker=SAPP
 
 ```
-> python3 masternode_scripts.py --checks
+
+#Examples
+
+```
+> python3 masternode_scripts.py --checks --ticker=777
 ```
 
 Will yield the following result:
@@ -87,14 +96,22 @@ Masternode MN3-XXXXX : ticker 777
 | | local blocks  - 683586
 | | remote blocks - 683586
 
+Wallet block height : 
+| block height : 683586
+| block hash   : eb8a3a5d6ee062024ba22346d144d3907a131561dae6e9c2859370e4e1f328df
+
+YAY, Wallet and Masternodes on same chain, all good.
+
 #### Save masternode.conf ##############################
 
-Do you want to save masternode.conf file ? (y/n) : y
+Do you want to save masternode.conf file ? (y/n, default=n): y
 masternode.conf saved to ~/Documents/masternode_scripts
 
 ```
 
-# params.json file:
+Notice that the block checks will be skipped if the wallet handles are not set.
+
+#params file
 
 The script comes with an integrated configurator that will help you generate the params.json file.
 
@@ -111,14 +128,16 @@ An example params.json is provided but not needed. You can delete it and you wil
 a new one.
 
 The file contains all the parameters needed to use the different functions
-* `ticker`: SAPP, 777, UCR, ODC, etc...
-* `wallet_data_dir`: Path to the data directory of your wallet (directory containing the blockchain and wallet.conf)
-* `wallet_cli_path`: wallet to the `cli` binary
-* `IHOSTMN-API-KEY`: You need to get it from ihostmn so you can connect to your account 
-  * visit https://ihostmn.com/settings.php to get your key.
-* `new_txs`: the list of transaction hashes and transaction indexes to create new MNs. 
-  You have two options :
-  
+* `IHOSTMN-API-KEY`: You need to get it from ihostmn so you can connect to your account
+visit https://ihostmn.com/settings.php to get your key.
+* `coins`: a dict containing all the coins parameters
+name: a free text for the coin name
+* `block_average` (optional): URL to retrieve the average block time from the API
+* `last_block` (optional): URL to retrieve the last block height from the API
+* `max_collateral_at_block`: (optional): block height at which the rewards start decreasing
+* `wallet_data_dir`: path to your wallet data dir for this coin
+* `wallet_cli_path`: path to your wallet cli (cli name must be included in the path)
+* `new_txs`: the list of transaction hashes and transaction indexes to create new MNs. You have two options :
   1) Simply type in your wallet console `getmasternodeoutputs` and copy/paste the result there
   2) Using the daemon, you can retrieve the transactions using the configurator (see : How to setup the wallet handles)
   

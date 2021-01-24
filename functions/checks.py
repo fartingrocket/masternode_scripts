@@ -2,8 +2,8 @@ from lib.ihostmn import ihostmn
 from lib.prompt import prompt_confirmation
 
 
-def checks():
-    command = ihostmn()
+def checks(ticker):
+    command = ihostmn(ticker=ticker)
 
     #################################
     print("#### Account Balance ####################################\n")

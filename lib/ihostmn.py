@@ -10,9 +10,10 @@ from lib.prompt import prompt_confirmation
 
 class ihostmn:
 
-    def __init__(self):
+    def __init__(self, ticker):
+        self.ticker = ticker
         self.config = configurator()
-        self.config.load()
+        self.config.load(self.ticker)
         self.masternodes_list = None
         self.masternodes_conf = None
 
@@ -25,8 +26,7 @@ class ihostmn:
         else:
             return data["result"]["balance"]
 
-    @staticmethod
-    def get_hosting_price(ticker) -> float:
+    def get_hosting_price(self) -> float:
         resp = requests.get("https://ihostmn.com/api/v1/hosting/public/list_all_coins")
         data = resp.json()
         if data["error"] != "":
@@ -34,7 +34,7 @@ class ihostmn:
             sys.exit(1)
         else:
             for coin in data["result"]["coins"]:
-                if coin["ticker"] == ticker:
+                if coin["ticker"] == self.ticker:
                     return coin["hosting_price"]
 
     def get_masternodes_list(self):
@@ -94,12 +94,13 @@ class ihostmn:
                     # Check if the transaction is already used in another MN
                     # Useful for the --create option
                     if tx["txhash"] in [mn["transaction_id"] for mn in self.masternodes_list]:
-                        print("Transaction : {}\nalready used for another Masternode. Skipping.\n".format(tx["txhash"]))
+                        print("Transaction : {} index : {}\n".format(tx["txhash"], tx["outputidx"]) +
+                              "already used for an existing Masternode. Skipping.\n")
                     else:
                         self.create_masternode(tx, alias)
                         created_new_mn = True
                 if not created_new_mn:
-                    print("No new Masternodes were created. Leaving now.\n")
+                    print(f"{bcolors.FAIL}No new Masternodes were created. Leaving now.{bcolors.END}\n")
                     sys.exit(0)
             else:
                 print("Masternode creation cancelled\n")
@@ -112,16 +113,16 @@ class ihostmn:
                 self.config.save_params_json()
                 self.create_masternodes()
             else:
-                print("Unable to find any transactions in wallet. Please check your wallet.\n")
+                print(f"{bcolors.WARN}Unable to find any new transactions. Please check your wallet.{bcolors.END}\n")
                 sys.exit(0)
 
     def create_masternode(self, tx, alias):
         tx_id = tx["txhash"]
         tx_index = tx["outputidx"]
         # Check if sufficient balance before creating masternode
-        if float(self.get_balance()) > float(self.get_hosting_price(self.config.ticker)):
+        if float(self.get_balance()) > float(self.get_hosting_price()):
             resp = requests.post("https://ihostmn.com/api/v1/hosting/user/create_new_masternode",
-                                 params={"cointicker": self.config.ticker,
+                                 params={"cointicker": self.ticker,
                                          "alias": alias,
                                          "txid": tx_id,
                                          "txindex": tx_index,
@@ -133,10 +134,11 @@ class ihostmn:
                 sys.exit(1)
             else:
                 new_id = data["result"]["id"]
-                print("Masternode {} with ID {} created\n".format(alias, new_id))
+                print("Masternode {} with ID {}".format(alias, new_id) +
+                      f"{bcolors.PASS} successfully created{bcolors.END}\n")
         else:
-            print("Insufficient Balance ! Cannot create Masternode. Leaving.\n")
-            print(self.get_balance(), self.get_hosting_price(self.config.ticker))
+            print(f"{bcolors.FAIL}Insufficient Balance ! Cannot create Masternode. Leaving.{bcolors.END}\n")
+            print("Remaining balance : ", self.get_balance(), "< Hosting price : ", self.get_hosting_price())
             sys.exit(0)
 
     def reindex_all_masternodes(self):
@@ -211,7 +213,7 @@ class ihostmn:
 
     def get_block_info_by_height(self, height):
         resp = requests.get("https://ihostmn.com/api/v1/coinstats/public/getblock",
-                            params={"ticker": self.config.ticker, "index": height})
+                            params={"ticker": self.ticker, "index": height})
         data = resp.json()
         if data["error"] != "":
             print(data["error"])

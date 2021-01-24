@@ -5,49 +5,44 @@ from functions.configure import configure
 from functions.delete_create import *
 from functions.help import help_string
 from functions.reindex import reindex_masternodes
+from functions.updates import check_coin_updates
 
 
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv, "hgkdxctra:i:",
+        opts, args = getopt.getopt(argv, "hgkdxctrna:i:e:",
                                    ["help", "configure", "checks", "delete", "delete-all", "create", "delcreate",
-                                    "reindex", "alias=", "id="])
+                                    "reindex", "nextupdate", "ticker=", "alias=", "id="])
     except getopt.GetoptError:
         print("Incorrect option(s). use <masternode_scripts.py -h> for help")
         sys.exit(1)
-    
-    opt = opts[0][0]
-    if opt in ("-h", "--help") and len(opts) == 1:
-        print(help_string)
-    elif opt in ("-g", "--configure") and len(opts) == 1:
-        configure()
-    elif opt in ("-k", "--checks") and len(opts) == 1:
-        checks()
-    elif opt in ("-d", "--delete") and len(opts) == 3:
-        if opts[1][0] in ("-a", "--alias") and opts[2][0] in ("-i", "--id"):
-            delete_one_masternode(alias=opts[1][1], id_=opts[2][1])
-        elif opts[1][0] in ("-i", "--id") and opts[2][0] in ("-a", "--alias"):
-            delete_one_masternode(alias=opts[2][1], id_=opts[1][1])
-        else:
-            print("Missing or incorrect argument(s). use <masternode_scripts.py -h> for help")
-            sys.exit(2)
-    elif opt in ("-x", "--delete-all") and len(opts) == 1:
-        delete_all_masternodes()
-    elif opt in ("-c", "--create") and len(opts) == 1:
-        create_new_masternodes()
-    elif opt in ("-t", "--delcreate") and len(opts) == 1:
-        delete_all_and_create()
-    elif opt in ("-r", "--reindex") and len(opts) == 1:
-        reindex_masternodes()
-    else:
-        print("Too many arguments. use <masternode_scripts.py -h> for help")
-        sys.exit(2)
+
+    try:
+        if opts[0][0] in ("-h", "--help") and len(opts) == 1:
+            print(help_string)
+        elif opts[0][0] in ("-g", "--configure") and len(opts) == 1:
+            configure()
+        elif opts[0][0] in ("-k", "--checks") and opts[1][0] in ("-e", "--ticker") and len(opts) == 2:
+            checks(ticker=opts[1][1])
+        elif opts[0][0] in ("-n", "--nextupdate") and opts[1][0] in ("-e", "--ticker") and len(opts) == 2:
+            check_coin_updates(ticker=opts[1][1])
+        elif opts[0][0] in ("-d", "--delete") and opts[1][0] in ("-e", "--ticker") and len(opts) == 3:
+            if opts[2][0] in ("-a", "--alias") and opts[3][0] in ("-i", "--id"):
+                delete_one_masternode(ticker=opts[1][1], alias=opts[2][1], id_=opts[3][1])
+            elif opts[2][0] in ("-i", "--id") and opts[3][0] in ("-a", "--alias"):
+                delete_one_masternode(ticker=opts[1][1], alias=opts[3][1], id_=opts[2][1])
+        elif opts[0][0] in ("-x", "--delete-all") and opts[1][0] in ("-e", "--ticker") and len(opts) == 2:
+            delete_all_masternodes(ticker=opts[1][1])
+        elif opts[0][0] in ("-c", "--create") and opts[1][0] in ("-e", "--ticker") and len(opts) == 2:
+            create_new_masternodes(ticker=opts[1][1])
+        elif opts[0][0] in ("-t", "--delcreate") and opts[1][0] in ("-e", "--ticker") and len(opts) == 2:
+            delete_all_and_create(ticker=opts[1][1])
+        elif opts[0][0] in ("-r", "--reindex") and opts[1][0] in ("-e", "--ticker") and len(opts) == 2:
+            reindex_masternodes(ticker=opts[1][1])
+    except IndexError:
+        print("Incorrect option(s). use <masternode_scripts.py -h> for help")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
-
-    if len(sys.argv) < 2:
-        print("Missing arguments. use <masternode_scripts.py -h> for help")
-        sys.exit(2)
-
     main(sys.argv[1:])
