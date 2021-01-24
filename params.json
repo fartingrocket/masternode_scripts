@@ -1,22 +1,40 @@
 {
-  "ticker": "777",
-  "wallet_data_dir": "path to wallet data directory here",
-  "wallet_cli_path": "path to wallet cli here, include the cli binary in the path",
-  "header": {
-    "IHOSTMN-API-KEY": "Your API KEY here"
-  },
-  "new_txs": [
-    {
-      "txhash": "transaction hash 1",
-      "outputidx": 0
+    "headers": {
+        "IHOSTMN-API-KEY": "Your ihostmn API key"
     },
-    {
-      "txhash": "transaction hash 2",
-      "outputidx": 0
-    },
-    {
-      "txhash": "transaction hash 3",
-      "outputidx": 0
+    "coins": {
+        "777": {
+            "name": "Jackpot 777",
+            "block_average": "https://explorer.777coin.win/api/block/average",
+            "last_block": "https://explorer.777coin.win/api/coin/history?limit=1",
+            "update_interval": 100000,
+            "max_collateral_at_block": 1000000,
+            "wallet_data_dir": "path to wallet data dir",
+            "wallet_cli_path": "path to wallet cli",
+            "new_txs": [
+                {
+                    "txhash": "transaction hash",
+                    "outputidx": 0
+                },
+                {
+                    "txhash": "transaction hash",
+                    "outputidx": 0
+                },
+                {
+                    "txhash": "transaction hash",
+                    "outputidx": 0
+                }
+            ]
+        },
+        "SAPP": {
+            "name": "SAPPHIRE",
+            "block_average": "https://sappexplorer.com/api/block/average",
+            "last_block": "https://sappexplorer.com/api/coin/history?limit=1",
+            "update_interval": 50000,
+            "max_collateral_at_block": 700000,
+            "wallet_data_dir": "",
+            "wallet_cli_path": "",
+            "new_txs": []
+        }
     }
-  ]
 }
