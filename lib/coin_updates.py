@@ -8,7 +8,7 @@ from lib.configurator import configurator
 class updates:
     def __init__(self, ticker):
         self.config = configurator()
-        self.config.load(ticker=ticker)
+        self.config.load(ticker=ticker, skip_wallet_setup=True)
         self.avg_block_time = None
         self.last_block_height = None
         self.next_update_block_height = None

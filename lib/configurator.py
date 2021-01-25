@@ -56,10 +56,11 @@ class configurator:
                     if coin == self.ticker:
                         self.loaded_coin_params = values[coin]
 
-    def load(self, ticker):
+    def load(self, ticker, skip_wallet_setup=False):
         self.ticker = ticker
         self.read_params_file()
         self.read_coin_params()
+        skip_params = ["wallet_data_dir", "wallet_cli_path", "wallet_handle", "new_txs"] if skip_wallet_setup else []
         need_save = False
 
         if not self.loaded_coin_params:
@@ -70,16 +71,16 @@ class configurator:
             if value not in ({}, [], "", None, 0):
                 setattr(self, param_name, value)
                 print("param '{}'".format(param_name)+f" {bcolors.PASS} found {bcolors.END}")
-            # We ignore "wallet_data_dir" and "wallet_cli_path" as these are used for wallet_handle
+            # We ignore wallet setup if missing and not needed
             # They will be set when user prompted to set wallet_handle
-            # If they are set however, they will be used in chain checks
-            elif param_name not in ["wallet_data_dir", "wallet_cli_path"]:
+            # However, if they are set in params.json, they will be used in chain checks
+            elif param_name not in skip_params:
                 print("param '{}'".format(param_name) + f" value {bcolors.FAIL}missing{bcolors.END}")
                 call = "set_" + param_name
                 getattr(self, call)()
                 need_save = True
             else:
-                print("'{}' value empty in the params.json".format(param_name))
+                print("param '{}' value ".format(param_name) + f"{bcolors.WARN}skipped{bcolors.END}")
 
         if self.wallet_data_dir and self.wallet_cli_path:
             self.wallet_handle = wallet(data_dir=self.wallet_data_dir, cli_path=self.wallet_cli_path)
@@ -186,9 +187,9 @@ class configurator:
                 self.save_params_json()
                 sys.exit(0)
         else:
-            print("Wallet handle missing.")
-            self.set_wallet_handle()
-            self.set_new_txs()
+            if prompt_confirmation("Wallet handles missing. Setup Wallet now ?", default="y"):
+                self.set_wallet_handle()
+                self.set_new_txs()
 
     def set_wallet_handle(self):
         # Setup the wallet handle to get transaction from the wallet
