@@ -26,22 +26,18 @@ class configurator:
         self.last_block = None
         self.update_interval = None
         self.max_collateral_at_block = None
-        self.wallet_data_dir = None
-        self.wallet_cli_path = None
+        self.wallet_data_dir = ""
+        self.wallet_cli_path = ""
         self.wallet_handle = None
         self.new_txs = []
 
-    def read_params(self):
+    def read_params_file(self, prompt_for_creation=True):
         if os.path.exists(self.params_path) and os.stat(self.params_path).st_size != 0:
-            print("#### Reading params.json\n")
+            print("#### Reading existing params.json\n")
             with open(self.params_path) as json_file:
                 self.params_file = json.load(json_file)
             for param, values in self.params_file.items():
-                if param == "coins":
-                    for coin, coin_param in values.items():
-                        if coin == self.ticker:
-                            self.loaded_coin_params = coin_param
-                elif param == "headers":
+                if param == "headers":
                     if values in ({}, [], "", None) or values["IHOSTMN-API-KEY"] in ({}, [], "", None):
                         print("'{}'".format(param) + f" value {bcolors.FAIL}missing{bcolors.END}")
                         self.set_headers()
@@ -49,13 +45,27 @@ class configurator:
                         self.headers = values
                         print("param 'headers'" + f" {bcolors.PASS} found {bcolors.END}")
         else:
-            print("#### Missing or empty params.json file starting configuration mode\n")
-            self.prompt_params_creation()
+            print("#### Missing or empty params.json file\n")
+            if prompt_for_creation:
+                self.prompt_params_creation()
+
+    def read_coin_params(self):
+        for param, values in self.params_file.items():
+            if param == "coins":
+                for coin in values.keys():
+                    if coin == self.ticker:
+                        self.loaded_coin_params = values[coin]
 
     def load(self, ticker):
         self.ticker = ticker
-        self.read_params()
+        self.read_params_file()
+        self.read_coin_params()
         need_save = False
+
+        if not self.loaded_coin_params:
+            print(f"{bcolors.WARN}No params found for provided ticker. entering configuration mode.{bcolors.END}")
+            self.prompt_params_creation(reload=True)
+
         for param_name, value in self.loaded_coin_params.items():
             if value not in ({}, [], "", None, 0):
                 setattr(self, param_name, value)
@@ -79,9 +89,10 @@ class configurator:
         else:
             print()
 
-    def prompt_params_creation(self):
+    def prompt_params_creation(self, reload=False):
 
-        self.set_headers()
+        if not self.headers or prompt_confirmation("Do you want to update headers ?", default="n"):
+            self.set_headers()
         self.set_ticker()
         self.set_name()
         self.set_block_average()
@@ -95,7 +106,7 @@ class configurator:
             print("\nWallet setup cancelled!\n"
                   "Please enter the transactions manually in params.json before restarting\n")
 
-        self.save_params_json(reload=True)
+        self.save_params_json(reload=reload)
 
     def save_params_json(self, reload=False):
 
@@ -182,9 +193,11 @@ class configurator:
     def set_wallet_handle(self):
         # Setup the wallet handle to get transaction from the wallet
         if not self.wallet_data_dir:
-            self.wallet_data_dir = input("Input the path to {} data directory : ".format(self.ticker))
+            resp = input("Input the path to {} data directory : ".format(self.ticker))
+            self.wallet_data_dir = resp if resp not in ({}, [], "", None) else ""
         if not self.wallet_cli_path:
-            self.wallet_cli_path = input("Input the path to the {} cli binary : ".format(self.ticker))
+            resp = input("Input the path to the {} cli binary : ".format(self.ticker))
+            self.wallet_cli_path = resp if resp not in ({}, [], "", None) else ""
 
         # Initiate the wallet handle if the paths are not empty
         if self.wallet_data_dir not in ({}, [], "", None) and self.wallet_cli_path not in ({}, [], "", None):
@@ -193,10 +206,8 @@ class configurator:
             if prompt_confirmation("Entered paths to the data directory and/or cli binary are empty !\n"
                                    "Do you wish to Cancel wallet setup ?", default="y"):
                 print("\nWallet setup cancelled!\n"
-                      "Please enter the transactions manually in params.json before restarting\n")
+                      "Please enter the transactions manually in params.json before restarting")
                 # Save before exit to keep data that was added during config
-                self.wallet_data_dir = ""
-                self.wallet_cli_path = ""
                 self.save_params_json()
                 sys.exit(0)
             else:

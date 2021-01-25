@@ -39,6 +39,9 @@ def main(argv):
             delete_all_and_create(ticker=opts[1][1])
         elif opts[0][0] in ("-r", "--reindex") and opts[1][0] in ("-e", "--ticker") and len(opts) == 2:
             reindex_masternodes(ticker=opts[1][1])
+        else:
+            print("Incorrect option(s). use <masternode_scripts.py -h> for help")
+            sys.exit(1)
     except IndexError:
         print("Incorrect option(s). use <masternode_scripts.py -h> for help")
         sys.exit(1)
